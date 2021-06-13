@@ -1,0 +1,46 @@
+{% extends "blog/base_to_login.html" %}
+
+{% block title %}Profile{% endblock %}
+{% block content %}
+<body>
+<div class="center_reg">
+    <p>Hello, {{ user.username }}!</p>
+    <div class="center_prof">
+        <div>
+            {% if ToFAdm == True %}
+            <div class="block green">Administrator: {{ToFAdm}}</div>
+            {% else %}
+            <div class="block red">Administrator: {{ToFAdm}}</div>
+            {% endif %}
+            {% if ToFModer == True %}
+            <div class="block green">Moderator: {{ToFModer}}</div>
+            {% else %}
+            <div class="block red">Moderator: {{ToFModer}}</div>
+            {% endif %}
+        </div>
+        <div>
+            {% if ToFModer == True %}
+            <div class="block border-button" onclick="location.href='/moderpanel'"><a class="border-block-a" href="/admpanel">ModerPanel</a></div>
+            {% endif %}
+            {% if ToFAdm == True %}
+            <div class="block border-button" onclick="location.href='/admpanel'"><a class="border-block-a" href="/admpanel">AdminPanel</a></div>
+            {% endif %}
+        </div>
+        <div>
+            <div class="block">1321321</div>
+            <div class="block">1321321</div>
+            <div class="block">1321321</div>
+            <div class="block">1321321</div>
+        </div>
+        <div>
+            <div class="block">1321321</div>
+            <div class="block">1321321</div>
+        </div>
+    </div>
+    <div class="ex">
+        <p><a href="/" class="menu_button">>Back</a></p>
+        <a href="/logout" class="menu_button">Logout</a>
+    </div>
+</div>
+</body>
+{% endblock %}

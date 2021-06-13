@@ -1,0 +1,40 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %} {% endblock %}</title>
+    <link href="{% static 'css/blog.css' %}" rel="stylesheet">
+    <style>
+    body {
+    background-image: url({% static 'photos/back.jpg' %});
+    }
+
+
+    </style>
+</head>
+<body>
+{% if error != True %}
+<div id="content">
+    {% block content %}
+    {% endblock %}
+</div>
+<div id="sidebar">
+    <h1>Main menu:</h1>
+    {% if login_name != False %}
+    <p><a class="user_nick" href="\profile">{{ login_name }}</a></p>
+    {% else %}
+    <p><a class="menu_button" href="\login">>Login</a></p>
+    <p><a class="menu_button" href="\registration">>Registration</a></p>
+    {% endif %}
+    <p><a class="menu_button" href="\">>Return to all films</a></p>
+    <p><a class="menu_button" href="\filters">>Find film</a></p>
+    <p><a class="menu_button" href="\add_film">>Add new film</a></p>
+</div>
+<footer class="footer">Made by LorCO©</footer>
+{% else %}
+<a href="/login" class="center_error"><img class="center" src="{% static 'photos/404.png' %}"></a>
+{% endif %}
+</body>
+</html>

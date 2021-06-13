@@ -1,0 +1,23 @@
+{% extends "blog/base_to_blog.html" %}
+
+{% block title %}All films{% endblock %}
+
+{% block content %}
+<div class="all_posts">
+    <h1>All films:</h1>
+    {% for post in posts %}
+    <div class="one_in_list" onclick="location.href='{{ post.slug }}'">
+        <h2>
+            <a href="{{ post.slug }}">
+                {{ post.title }}
+            </a>
+            <p class="date">Style: {{ post.style }} </p>
+        </h2>
+        <img class="art" src="{{ post.art_link }}">
+        <p>Description:</p>
+        {{ post.description|truncatewords:50|linebreaks }}
+        <p class="date">Published: {{ post.publish }}</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

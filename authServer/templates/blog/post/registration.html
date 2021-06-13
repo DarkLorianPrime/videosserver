@@ -1,0 +1,29 @@
+{% extends "blog/base_to_login.html" %}
+
+{% block title %}Registration{% endblock %}
+
+{% block content %}
+<div class="center_reg">
+    <h2 class="Auth_class">Registration menu</h2>
+    {% if loggined == True %}
+    <p>WRONG LOGIN, E-MAIL OR PASSWORD!</p>
+    {% elif loggined == 'Login' %}
+    <p>THIS LOGIN ALREADY EXISTS!</p>
+    {% elif loggined == 'Email' %}
+    <p>THIS E-MAIL ALREADY EXISTS!</p>
+    {% endif %}
+    <form class="border_form" action="." method="post">
+        <p>Login</p>
+        <p>{{ form.login }}</p>
+        <p>Password</p>
+        <p>{{ form.password }}</p>
+        <p>E-Mail</p>
+        <p>{{ form.email }}</p>
+        {% csrf_token %}
+        <p><a href="/Recent">Recent password</a></p>
+        <a href="/login">Login</a>
+        <a class="Back" href="/">>>Back</a>
+        <p><input class="input_button" type="submit" value="Authorizate"></p>
+    </form>
+</div>
+{% endblock %}
