@@ -12,5 +12,9 @@ class FilmForm(forms.Form):
     style = forms.ModelChoiceField(queryset=styles.objects.all())
 
 
+class NewStyleForm(forms.Form):
+    Name = forms.CharField(max_length=1000)
+
+
 class NewNameForm(forms.Form):
     Name = forms.CharField(max_length=100, label='', widget=forms.TextInput)

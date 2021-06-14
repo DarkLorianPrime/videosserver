@@ -7,11 +7,11 @@
 <div class="all_posts center">
     <h1>Add new {{ who }}</h1>
     {% if loggined == True %}
-    <p class="text_prod">This {{ who }} already exists</p>
+    <p class="text_prod">This actor already exists</p>
     {% endif %}
     <form method="post">
-        <a class="text_prod">Name</a>
-        <a class="border">{{ form.Name }}</a>
+        <a class="text_prod">Style</a>
+        <a class="border">{{ form.name }}</a>
         {% csrf_token %}
         <p><input class="input_button otstyp" type="submit" value="Add new {{ who }}"></p>
     </form>

@@ -9,5 +9,6 @@ urlpatterns = [
     path('loggined', views.get_login, name='get_login'),
     path('add_film', views.new_film, name='new_film'),
     path('add_producer', views.new_prod, name='new_prod'),
-    path('add_actor', views.new_actor, name='new_actor')
+    path('add_actor', views.new_actor, name='new_actor'),
+    path('add_style', views.new_style, name='new_style')
 ]

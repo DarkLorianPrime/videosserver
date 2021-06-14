@@ -2,17 +2,18 @@ import requests
 from django.shortcuts import render, get_object_or_404, redirect
 
 from Blog import models
-from Blog.Form import FilmForm, NewNameForm
+from Blog.Form import FilmForm, NewNameForm, NewStyleForm
 from Blog.models import Post
 from extras.check_person import get_login
 
 
 def new_prod(request):
+    form = NewNameForm()
     text = get_login(request)
     login_name = False
-    if text is not False:
+    if text[0] is not False:
         login_name = text[0].username
-    if text[1] is False:
+    if text[1] is False or text[2] is False:
         return render(request, 'blog/post/new_prod.html', {'error': True})
     if request.method == 'POST':
         form = NewNameForm(request.POST)
@@ -22,17 +23,16 @@ def new_prod(request):
             if filters is not None:
                 return render(request, 'blog/post/new_prod.html', {'form': form, 'loggined': True})
             models.prod(name=returned['Name']).save()
-            return redirect('/')
-    form = NewNameForm()
-    return render(request, 'blog/post/new_prod.html', {'form': form, 'who': 'producer', 'login_name': login_name})
+    return render(request, 'blog/post/new_prod.html', {'form': form, 'who': 'producer', 'login_name': login_name, 'admin': True})
 
 
 def new_actor(request):
+    form = NewNameForm()
     text = get_login(request)
     login_name = False
-    if text is not False:
+    if text[0] is not False:
         login_name = text[0].username
-    if text[1] is False:
+    if text[2] is False:
         return render(request, 'blog/post/new_prod.html', {'error': True})
     if request.method == 'POST':
         form = NewNameForm(request.POST)
@@ -40,19 +40,36 @@ def new_actor(request):
             returned = form.cleaned_data
             filters = models.actors.objects.filter(name=returned['Name']).first()
             if filters is not None:
-                return render(request, 'blog/post/new_prod.html', {'form': form, 'loggined': True})
+                return render(request, 'blog/post/new_prod.html', {'form': form, 'loggined': True, 'admin': True, 'who': 'actor', 'login_name': login_name})
             models.actors(name=returned['Name']).save()
-            return redirect('/')
-    form = NewNameForm()
-    return render(request, 'blog/post/new_prod.html', {'form': form, 'who': 'actor', 'login_name': login_name})
+    return render(request, 'blog/post/new_prod.html', {'form': form, 'who': 'actor', 'login_name': login_name, 'admin': True})
+
+
+def new_style(request):
+    login_name, admin, text, form = False, False, get_login(request), NewStyleForm()
+    if text[0] is not False:
+        login_name = text[0].username
+    if text[1] is False:
+        return render(request, 'blog/post/new_film.html', {'error': True})
+    if request.method == 'POST':
+        form = NewStyleForm(request.POST)
+        if form.is_valid():
+            returned = form.cleaned_data
+            if models.styles.objects.filter(style=returned['Name']).first() is not None:
+                return render(request, 'blog/post/new_prod.html', {'form': form, 'loggined': True, 'admin': True, 'who': 'style', 'login_name': login_name})
+            models.styles(style=returned['Name']).save()
+    return render(request, 'blog/post/new_prod.html', {'admin': True, 'login_name': login_name, 'form': form, 'who': 'style'})
 
 
 def new_film(request):
-    dictes_for_actors, dictes_for_prods, z = {}, {}, 0
+    form = FilmForm()
+    dictes_for_actors, dictes_for_prods, z, w = {}, {}, 0, 0
     text = get_login(request)
-    login_name = False
-    if text is not False:
-        login_name = text.username
+    login_name, admin = False, False
+    if text[0] is not False:
+        login_name = text[0].username
+    if text[1] is False:
+        return render(request, 'blog/post/new_film.html', {'error': True})
     if request.method == 'POST':
         form = FilmForm(request.POST)
         if form.is_valid():
@@ -62,10 +79,9 @@ def new_film(request):
             for i in returned['actors']:
                 dictes_for_actors[str(z)] = str(i)
                 z += 1
-            z = 0
             for i in returned['prod']:
                 dictes_for_prods[str(z)] = str(i)
-                z += 1
+                w += 1
             photo = returned['art_link']
             if returned['art_link'] == '':
                 photo = requests.get(f'https://imdb-api.com/API/SearchTitle/k_hfcfkmgb/{returned["Title"]}').json()[
@@ -75,28 +91,31 @@ def new_film(request):
                         slug=returned['slug'], description=returned['description'], author='darklorian', art_link=photo,
                         style=returned['style']).save()
             return redirect('/')
-    form = FilmForm()
-    return render(request, 'blog/post/new_film.html', {'form': form, 'login_name': login_name})
+    return render(request, 'blog/post/new_film.html', {'form': form, 'login_name': login_name, 'admin': True})
 
 
 def post_list(request):
     post_listin = Post.objects.all()
     text = get_login(request)
-    login_name = False
-    if text is not False:
+    login_name, admin = False, False
+    if text[0] is not False:
         login_name = text[0]
-    return render(request, 'blog/post/list.html', {'posts': post_listin, 'login_name': login_name})
+    if text[1] is not False or text[2] is not False:
+        admin = True
+    return render(request, 'blog/post/list.html', {'posts': post_listin, 'login_name': login_name, 'admin': admin})
 
 
 def post_one(request, post):
     post, text = get_object_or_404(Post, slug=post), get_login(request)
-    login_name = False
+    login_name, admin = False, False
     if text[0] is not False:
         login_name = text[0].username
+    if text[1] is not False or text[2] is not False:
+        admin = True
     f, g = [], []
     for i in post.producer.values():
         f.append(i)
     for i in post.actors.values():
         g.append(i)
     s, z = ', '.join(f), ', '.join(g)
-    return render(request, 'blog/post/detail.html', {'post': post, 'login_name': login_name, 'actors': z, 'prods': s})
+    return render(request, 'blog/post/detail.html', {'post': post, 'login_name': login_name, 'actors': z, 'prods': s, 'admin': admin})
