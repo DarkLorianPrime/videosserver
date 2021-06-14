@@ -68,10 +68,9 @@ def new_film(request):
                 z += 1
             photo = returned['art_link']
             if returned['art_link'] == '':
-                photo = \
-                    requests.get(f'https://imdb-api.com/API/SearchTitle/k_hfcfkmgb/{returned["Title"]}').json()[
-                        'results'][
-                        0]['image']
+                photo = requests.get(f'https://imdb-api.com/API/SearchTitle/k_hfcfkmgb/{returned["Title"]}').json()[
+                    'results'][
+                    0]['image']
             models.Post(title=returned['Title'], producer=dictes_for_prods, actors=dictes_for_actors,
                         slug=returned['slug'], description=returned['description'], author='darklorian', art_link=photo,
                         style=returned['style']).save()

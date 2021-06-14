@@ -36,8 +36,17 @@ def profile(request):
     text = get_login(request)
     if text[0] is False:
         return render(request, 'blog/get/profile.html', {'error': True})
-    else:
-        return render(request, 'blog/get/profile.html', {'user': text[0], 'ToFAdm': True, 'ToFModer': True})
+    toAdm = False
+    toMod = False
+    if text[1] is not False:
+        toAdm = True
+        if text[2] is not False:
+            toMod = True
+    if text[2] is not False:
+        toMod = True
+        if text[1] is not False:
+            toAdm = False
+    return render(request, 'blog/get/profile.html', {'user': text[0], 'ToFAdm': toAdm, 'ToFModer': toMod})
 
 
 def registration(request):

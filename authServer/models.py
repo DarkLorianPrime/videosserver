@@ -17,6 +17,20 @@ class not_Admin(models.Model):
         return self.name
 
 
+class Moderator(models.Model):
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
+
+
+class not_Moderator(models.Model):
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
+
+
 class Admin(models.Model):
     name = models.CharField(max_length=255)
 
