@@ -9,9 +9,12 @@ def get_login(request):
     if cookie is not None:
         Users = User.objects.filter(id=cookie.cookie_user_id).first()
         is_admin = False
-        is_admin_or_not = Admin.objects.filter(name=Users).first()
+        is_mod = False
+        if_admin_or_not = Admin.objects.filter(name=Users).first()
         if_mod_or_not = Moderator.objects.filter(name=Users).first()
-        if is_admin_or_not is not None:
+        if if_admin_or_not is not None:
             is_admin = True
-        return Users, is_admin
-    return False, False
+        if if_mod_or_not is not None:
+            is_mod = True
+        return Users, is_admin, is_mod
+    return False, False, False

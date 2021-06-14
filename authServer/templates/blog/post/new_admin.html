@@ -1,16 +1,16 @@
 {% extends "blog/base_to_login.html" %}
 
-{% block title %}Add admin{% endblock %}
+{% block title %}Add {{new}}{% endblock %}
 
 {% block content %}
 {% if error != True %}
 <div class="center_reg">
     <form method="post">
-        <p>Login</p>
+        <p>Add new {{new}}</p>
         {{ form.nick }}
         {% csrf_token %}
         <p><a class="Back" href="/">>>Back</a></p>
-        <p><input class="input_button" type="submit" value="Add new admin"></p>
+        <p><input class="input_button" type="submit" value="Add new {{new}}"></p>
     </form>
 </div>
 {% endif %}

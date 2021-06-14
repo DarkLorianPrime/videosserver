@@ -24,13 +24,16 @@
     <h1>Main menu:</h1>
     {% if login_name != False %}
     <p><a class="user_nick" href="\profile">{{ login_name }}</a></p>
+    {% if admin == True %}
+    <p><a class="menu_button" href="\add_film">>Add new film</a></p>
+    <p><a class="menu_button" href="\adminPanel">>AdminPanel</a></p>
+    {% endif %}
     {% else %}
     <p><a class="menu_button" href="\login">>Login</a></p>
     <p><a class="menu_button" href="\registration">>Registration</a></p>
     {% endif %}
     <p><a class="menu_button" href="\">>Return to all films</a></p>
     <p><a class="menu_button" href="\filters">>Find film</a></p>
-    <p><a class="menu_button" href="\add_film">>Add new film</a></p>
 </div>
 <footer class="footer">Made by LorCO©</footer>
 {% else %}
