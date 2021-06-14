@@ -21,5 +21,11 @@
     <br>
     <br>
     <br>
+    {% if admin == True %}
+    <form method="post">
+        <button class="menu_button button">Delete this page</button>
+        {% csrf_token %}
+    </form>
+    {% endif %}
 </div>
 {% endblock %}

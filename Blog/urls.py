@@ -10,5 +10,7 @@ urlpatterns = [
     path('add_film', views.new_film, name='new_film'),
     path('add_producer', views.new_prod, name='new_prod'),
     path('add_actor', views.new_actor, name='new_actor'),
-    path('add_style', views.new_style, name='new_style')
+    path('add_style', views.new_style, name='new_style'),
+    path('moderPanel', views.moderPanel, name='moderPanel'),
+    path('adminPanel', views.adminPanel, name='adminPanel')
 ]
