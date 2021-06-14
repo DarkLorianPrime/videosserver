@@ -12,5 +12,7 @@ def get_login(request):
         is_admin_or_not = Admin.objects.filter(name=Users).first()
         if is_admin_or_not is not None:
             is_admin = True
+        print(User, is_admin)
+        print('==========================================')
         return Users, is_admin
-    return False
+    return False, False

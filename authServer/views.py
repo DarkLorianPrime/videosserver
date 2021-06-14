@@ -17,16 +17,16 @@ def auth(request):
             print(obj)
             if obj is None:
                 return render(request, 'blog/post/share.html', {'form': form, 'loggined': True})
-            if obj.check_password(raw_password=cd['password']) is True:
-                data = uuid.uuid4().hex
-                red = redirect('/')
-                print(cookie_saves.objects.filter(cookie_user_id=obj.id).first())
-                if cookie_saves.objects.filter(cookie_user_id=obj.id).first() is None:
-                    cookie_saves(cookie_user_id=obj.id, cookie_user_token=data).save()
-                    red.set_cookie(key='loggined_token', value=data, max_age=100000)
-                return red
+            if obj.check_password(raw_password=cd['password']) is not True:
+                return render(request, 'blog/post/share.html', {'form': form, 'loggined': True})
+            data = uuid.uuid4().hex
+            red = redirect('/')
+            if cookie_saves.objects.filter(cookie_user_id=obj.id).first() is None:
+                cookie_saves(cookie_user_id=obj.id, cookie_user_token=data).save()
+                red.set_cookie(key='loggined_token', value=data, max_age=100000)
+            return red
     else:
-        if get_login(request) is not False:
+        if get_login(request)[0] is not False:
             return redirect('/')
         form = LoginForm()
     return render(request, 'blog/post/share.html', {'form': form, 'loggined': False})
@@ -38,6 +38,7 @@ def profile(request):
         return render(request, 'blog/get/profile.html', {'error': True})
     else:
         return render(request, 'blog/get/profile.html', {'user': text[0], 'ToFAdm': True, 'ToFModer': True})
+
 
 def registration(request):
     if request.method == 'POST':
@@ -57,7 +58,7 @@ def registration(request):
         else:
             loggined = True
     else:
-        if get_login(request) is not False:
+        if get_login(request)[0] is not False:
             return redirect('/')
         form = RegistrationForm()
         loggined = False
