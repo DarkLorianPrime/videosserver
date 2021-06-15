@@ -4,7 +4,8 @@ from django.shortcuts import render, get_object_or_404, redirect
 
 from Blog.Form import FilmForm, NewNameForm, NewStyleForm, RatingForm, FiltersForm
 from Blog.models import Post, Rating, Actors, Prod, Styles
-from extras.check_person import get_login
+from authServer.models import Moderator, Admin, Role
+from extras.authentication import BackendAuth
 
 
 def new_prod(request):
@@ -154,11 +155,12 @@ def new_film(request):
 
 def post_list(request):
     post_listin = Post.objects.all()
-    text = get_login(request)
+    user = BackendAuth().get_user(request.COOKIES.get('loggined_token'))
     login_name, admin = False, False
-    if text[0] is not False:
-        login_name = text[0]
-    if text[1] is not False or text[2] is not False:
+    if user is not None:
+        login_name = user.username
+    print()
+    if Admin.is_admin:
         admin = True
     return render(request, 'blog/post/list.html', {'posts': post_listin, 'login_name': login_name, 'admin': admin})
 
@@ -171,11 +173,13 @@ def post_one_delete(request, post):
 def post_one(request, post):
     integ, integ_sum, dict_for_sum = 0, 0, {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0}
     form = RatingForm()
-    poster, text = get_object_or_404(Post, slug=post), get_login(request)
+    poster, user = get_object_or_404(Post, slug=post), BackendAuth().get_user(request.COOKIES.get('loggined_token'))
     login_name, admin = False, False
-    if text[0] is not False:
-        login_name = text[0].username
-    if text[1] is not False or text[2] is not False:
+    if user is not None:
+        login_name = user.username
+    selected_people = Role.objects.filter(Users=user)
+    if selected_people.filter(name='Administrator', is_Role='True').first() is not None or selected_people.filter(
+            name='Moderator', is_Role='True').first() is not None:
         admin = True
     rating_user = Rating.objects.filter(name=post, username=login_name).first()
     if rating_user is None:
@@ -186,16 +190,17 @@ def post_one(request, post):
                 Rating.objects.create(name=post, username=login_name, stars=stars['like'])
     else:
         form = True
-    rating_all = Rating.objects.all()
+    rating_all = Rating.objects.all().filter(name=post)
     for i in rating_all:
         dict_for_sum[str(i.stars)] = dict_for_sum[str(i.stars)] + 1
         integ += int(i.stars)
         integ_sum += 1
-    dict_for_sum['all'] = integ / integ_sum
+    if integ_sum != 0:
+        dict_for_sum['all'] = integ / integ_sum
     Actors_list, producers_list = [], []
     for i in poster.producer.values():
         producers_list.append(i)
-    for i in poster.Actors.values():
+    for i in poster.actors.values():
         Actors_list.append(i)
     producers, Actors = ', '.join(producers_list), ', '.join(Actors_list)
     return render(request, 'blog/post/detail.html',

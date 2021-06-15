@@ -5,11 +5,11 @@
 {% block content %}
 <div class="center_reg">
     <h2 class="Auth_class">Registration menu</h2>
-    {% if loggined == True %}
+    {% if trouble == True %}
     <p>WRONG LOGIN, E-MAIL OR PASSWORD!</p>
-    {% elif loggined == 'Login' %}
+    {% elif trouble == 'Login' %}
     <p>THIS LOGIN ALREADY EXISTS!</p>
-    {% elif loggined == 'Email' %}
+    {% elif trouble == 'Email' %}
     <p>THIS E-MAIL ALREADY EXISTS!</p>
     {% endif %}
     <form class="border_form" action="." method="post">

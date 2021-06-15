@@ -10,22 +10,18 @@ class cookie_saves(models.Model):
         return self.cookie_user_id
 
 
-class not_Admin(models.Model):
+class Role(models.Model):
     name = models.CharField(max_length=255)
+    Users = models.ForeignKey(User, on_delete=models.CASCADE, related_name='styles_names')
+    is_Role = models.BooleanField()
 
     def __str__(self):
-        return self.name
+        return str(self.Users)
 
 
 class Moderator(models.Model):
     name = models.CharField(max_length=255)
-
-    def __str__(self):
-        return self.name
-
-
-class not_Moderator(models.Model):
-    name = models.CharField(max_length=255)
+    is_moder = models.BooleanField()
 
     def __str__(self):
         return self.name
@@ -33,6 +29,7 @@ class not_Moderator(models.Model):
 
 class Admin(models.Model):
     name = models.CharField(max_length=255)
+    is_admin = models.BooleanField()
 
     def __str__(self):
         return self.name

@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import not_Admin, not_Moderator, Moderator, Admin
+from .models import Moderator, Admin, Role
 
 
 class ModerDeleteForm(forms.Form):
@@ -11,8 +11,8 @@ class AdminDeleteForm(forms.Form):
     name = forms.ModelChoiceField(queryset=Admin.objects.all())
 
 
-class DelUserForm(forms.Form):
-    name = forms.ModelChoiceField(queryset=not_Moderator.objects.all())
+# class DelUserForm(forms.Form):
+#     name = forms.ModelChoiceField(queryset=not_Moderator.objects.all())
 
 
 class LoginForm(forms.Form):
@@ -21,11 +21,11 @@ class LoginForm(forms.Form):
 
 
 class new_adminForm(forms.Form):
-    nick = forms.ModelChoiceField(queryset=not_Admin.objects.all())
+    nick = forms.ModelChoiceField(queryset=Role.objects.all().filter(name='Administrator'))
 
 
 class new_moderForm(forms.Form):
-    nick = forms.ModelChoiceField(queryset=not_Moderator.objects.all())
+    nick = forms.ModelChoiceField(queryset=Role.objects.all())
 
 
 class RegistrationForm(forms.Form):

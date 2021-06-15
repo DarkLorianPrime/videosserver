@@ -20,6 +20,7 @@ a {
     box-shadow: 5px 5px 5px black;
     padding-bottom: 10px;
     background-color: white;
+    word-wrap: break-word;
 }
 .menu_button {
    font-size: 25px;
@@ -254,6 +255,7 @@ html {
 .main_div_for_detail {
     background-color: rgba(255, 255, 255, 0.7);
     padding-left: 10px;
+    word-wrap: break-word;
 }
 .ex {
 margin-top: 50px;

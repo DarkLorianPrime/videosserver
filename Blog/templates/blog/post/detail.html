@@ -6,22 +6,24 @@
 </head>
 {% block content %}
 <div class="main_div_for_detail">
-    <h1>{{post.title}}</h1>
-    <div class="ogr">
-        <img class="art_m" src="{{post.art_link}}" alt="incorrect src">
+    <div>
+        <h1>{{post.title}}</h1>
+        <div class="ogr">
+            <img class="art_m" src="{{post.art_link}}" alt="incorrect src">
+        </div>
+        <p class="text_desc">Actors:</p>
+        <p class="text_desc">{{actors}}</p>
+        <hr>
+        <p class="text_desc">Producer:</p>
+        <p class="text_desc">{{prods}}</p>
+        <hr>
+        <p class="text_desc">Description:</p>
+        <p class="text_desc">{{post.description}}</p>
+        <br>
+        <br>
+        <br>
+        <br>
     </div>
-    <p class="text_desc">Actors:</p>
-    <p class="text_desc">{{actors}}</p>
-    <hr>
-    <p class="text_desc">Producer:</p>
-    <p class="text_desc">{{prods}}</p>
-    <hr>
-    <p class="text_desc">Description:</p>
-    <p class="text_desc">{{post.description}}</p>
-    <br>
-    <br>
-    <br>
-    <br>
     {% if admin == True %}
     <form method="post">
         <button class="menu_button button">Delete this page</button>

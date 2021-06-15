@@ -1,12 +1,13 @@
-import uuid
-
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 
-from extras.check_person import get_login
-from .models import cookie_saves, not_Admin, Admin, not_Moderator, Moderator
-from .Form import LoginForm, RegistrationForm, new_adminForm, new_moderForm, DelUserForm, ModerDeleteForm, \
-    AdminDeleteForm
+from extras.authentication import BackendAuth
+from .Form import RegistrationForm, LoginForm, new_moderForm, new_adminForm
+from .models import cookie_saves, Admin, Moderator, Role
+
+
+# from .Form import LoginForm, RegistrationForm, new_adminForm, new_moderForm, DelUserForm, ModerDeleteForm, \
+#     AdminDeleteForm
 
 
 def del_user(request):
@@ -20,10 +21,10 @@ def del_user(request):
             user = User.objects.filter(username=cd['name']).first()
             if user is not None:
                 user.delete()
-                not_Moderator.objects.filter(name=cd['name']).first().delete()
-                not_admin = not_Admin.objects.filter(name=cd['name']).first()
-                if not_admin is not None:
-                    not_admin.delete()
+                # not_Moderator.objects.filter(name=cd['name']).first().delete()
+                # not_admin = not_Admin.objects.filter(name=cd['name']).first()
+                # if not_admin is not None:
+                #     not_admin.delete()
     return render(request, 'blog/post/deluser.html', {'form': form, 'who': 'user'})
 
 
@@ -38,7 +39,7 @@ def del_moderator(request):
             find = Moderator.objects.filter(name=cd['name']).first()
             if find is not None:
                 find.delete()
-                not_Moderator.objects.create(name=cd['name'])
+                # not_Moderator.objects.create(name=cd['name'])
     return render(request, 'blog/post/deluser.html', {'form': form, 'who': 'moderator'})
 
 
@@ -53,30 +54,25 @@ def del_administrator(request):
             find = Admin.objects.filter(name=cd['name']).first()
             if find is not None:
                 find.delete()
-                not_Admin.objects.create(name=cd['name'])
+                # not_Admin.objects.create(name=cd['name'])
     return render(request, 'blog/post/deluser.html', {'form': form, 'who': 'administrator'})
 
 
 def auth(request):
-    form = LoginForm()
-    if get_login(request)[0] is not False:
+    if BackendAuth().get_user(request.COOKIES.get('loggined_token')) is not None:
         return redirect('/')
+    trouble = False
+    form = LoginForm()
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid():
             cd = form.cleaned_data
-            obj = User.objects.filter(username=cd['login']).first()
-            if obj is None:
-                return render(request, 'blog/post/share.html', {'form': form, 'loggined': True})
-            if obj.check_password(raw_password=cd['password']) is not True:
-                return render(request, 'blog/post/share.html', {'form': form, 'loggined': True})
-            data = uuid.uuid4().hex
-            red = redirect('/')
-            if cookie_saves.objects.filter(cookie_user_id=obj.id).first() is None:
-                cookie_saves.objects.create(cookie_user_id=obj.id, cookie_user_token=data)
-                red.set_cookie(key='loggined_token', value=data, max_age=100000)
-            return red
-    return render(request, 'blog/post/share.html', {'form': form, 'loggined': False})
+            Login_return = BackendAuth().authenticate(request=request, username=cd['login'], password=cd['password'],
+                                                      email=cd['email'])
+            if not Login_return.get('error'):
+                return Login_return
+            trouble = True
+    return render(request, 'blog/post/share.html', {'form': form, 'trouble': trouble})
 
 
 def profile(request):
@@ -87,27 +83,23 @@ def profile(request):
 
 
 def registration(request):
-    form, loggined = RegistrationForm(), False
+    form, trouble = RegistrationForm(), False
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
         if form.is_valid():
-            cd = form.cleaned_data
-            if User.objects.filter(username=cd['login']).first() is not None:
-                return render(request, 'blog/post/registration.html', {'form': form, 'loggined': 'Login'})
-            if User.objects.filter(email=cd['email']).first() is not None:
-                return render(request, 'blog/post/registration.html', {'form': form, 'loggined': 'Email'})
-            print(cd['password'], cd['login'])
-            User.objects.create_user(username=cd['login'], password=cd['password'], email=cd['email']).save()
-            data, red, obj = uuid.uuid4().hex, redirect('/'), User.objects.filter(username=cd['login']).first()
-            cookie_saves.objects.create(cookie_user_id=obj.id, cookie_user_token=data)
-            not_Admin.objects.create(name=cd['login'])
-            not_Moderator.objects.create(name=cd['login'])
-            red.set_cookie(key='loggined_token', value=data, max_age=100000)
-            return red
-        loggined = True
-    if get_login(request)[0] is not False:
+            returned = form.cleaned_data
+            Registration_return = BackendAuth().authenticate(request=request, username=returned['login'],
+                                                             password=returned['password'],
+                                                             email=returned['email'], registration=True)
+            if Registration_return.get('error') == 'username':
+                trouble = 'Login'
+            elif Registration_return.get('error') == 'email':
+                trouble = 'Email'
+            else:
+                return Registration_return
+    if BackendAuth().get_user(request.COOKIES.get('loggined_token')) is not None:
         return redirect('/')
-    return render(request, 'blog/post/registration.html', {'form': form, 'loggined': loggined})
+    return render(request, 'blog/post/registration.html', {'form': form, 'trouble': trouble})
 
 
 def add_moderator(request):
@@ -116,7 +108,7 @@ def add_moderator(request):
         form = new_moderForm(request.POST)
         if form.is_valid():
             returned = form.cleaned_data
-            not_Moderator.objects.get(name=returned['nick']).delete()
+            # not_Moderator.objects.get(name=returned['nick']).delete()
             Moderator.objects.create(name=returned['nick'])
     text = get_login(request)
     if text[1] is False:
@@ -125,17 +117,26 @@ def add_moderator(request):
 
 
 def add_admin(request):
+    user = BackendAuth().get_user(request.COOKIES.get('loggined_token'))
     form = new_adminForm()
+    print(user)
+    if user is None:
+        print(1)
     if request.method == 'POST':
         form = new_adminForm(request.POST)
         if form.is_valid():
             returned = form.cleaned_data
-            not_Admin.objects.get(name=returned['nick']).delete()
-            Admin.objects.create(name=returned['nick'])
-            not_Moderator.objects.get(name=returned['nick']).delete()
-            Moderator.objects.create(name=returned['nick'])
-    text = get_login(request)
-    if text[1] is False:
+            if user is not None:
+                User_Model = User.objects.filter(username=returned['nick'])
+                Role_selected = Role.objects.filter(name='Administrator', Users=User_Model)
+                Role_selected_Mod = Role.objects.filter(name='Moderator', Users=User_Model)
+                if not Role_selected.is_Role:
+                    Role_selected.is_Role = True
+                    Role_selected.save()
+                if not Role_selected_Mod.is_Role:
+                    Role_selected_Mod.is_Role = True
+                    Role_selected_Mod.save()
+    if user is None:
         return render(request, 'blog/post/new_admin.html', {'error': True})
     return render(request, 'blog/post/new_admin.html', {'form': form, 'loggined': True, 'new': 'administrator'})
 
