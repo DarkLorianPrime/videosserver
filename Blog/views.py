@@ -45,6 +45,26 @@ def new_actor(request):
     return render(request, 'blog/post/new_prod.html', {'form': form, 'who': 'actor', 'login_name': login_name, 'admin': True})
 
 
+def moderPanel(request):
+    text = get_login(request)
+    login_name = False
+    if text[0] is not False:
+        login_name = text[0].username
+    if text[2] is False:
+        return render(request, 'blog/post/moderPanel.html', {'error': True})
+    return render(request, 'blog/post/moderPanel.html', {'login_name': login_name, 'admin': True})
+
+
+def adminPanel(request):
+    text = get_login(request)
+    login_name = False
+    if text[0] is not False:
+        login_name = text[0].username
+    if text[1] is False:
+        return render(request, 'blog/post/moderPanel.html', {'error': True})
+    return render(request, 'blog/post/adminPanel.html', {'login_name': login_name, 'admin': True})
+
+
 def new_style(request):
     login_name, admin, text, form = False, False, get_login(request), NewStyleForm()
     if text[0] is not False:
@@ -84,9 +104,9 @@ def new_film(request):
                 w += 1
             photo = returned['art_link']
             if returned['art_link'] == '':
-                photo = requests.get(f'https://imdb-api.com/API/SearchTitle/k_hfcfkmgb/{returned["Title"]}').json()[
-                    'results'][
-                    0]['image']
+                photo = requests.get(f'https://imdb-api.com/API/SearchTitle/k_hfcfkmgb/{returned["Title"]}').json()['results']
+                if photo:
+                    photo = photo[0]['image']
             models.Post(title=returned['Title'], producer=dictes_for_prods, actors=dictes_for_actors,
                         slug=returned['slug'], description=returned['description'], author='darklorian', art_link=photo,
                         style=returned['style']).save()
@@ -106,16 +126,21 @@ def post_list(request):
 
 
 def post_one(request, post):
-    post, text = get_object_or_404(Post, slug=post), get_login(request)
+    poster, text = get_object_or_404(Post, slug=post), get_login(request)
     login_name, admin = False, False
     if text[0] is not False:
         login_name = text[0].username
     if text[1] is not False or text[2] is not False:
         admin = True
-    f, g = [], []
-    for i in post.producer.values():
-        f.append(i)
-    for i in post.actors.values():
-        g.append(i)
-    s, z = ', '.join(f), ', '.join(g)
-    return render(request, 'blog/post/detail.html', {'post': post, 'login_name': login_name, 'actors': z, 'prods': s, 'admin': admin})
+        if request.method == 'POST':
+            post = Post.objects.filter(slug=post).first()
+            if post is not None:
+                post.delete()
+            return redirect('/')
+    actors_list, producers_list = [], []
+    for i in poster.producer.values():
+        producers_list.append(i)
+    for i in poster.actors.values():
+        actors_list.append(i)
+    producers, actors = ', '.join(producers_list), ', '.join(actors_list)
+    return render(request, 'blog/post/detail.html', {'post': post, 'login_name': login_name, 'actors': actors, 'prods': producers, 'admin': admin})
