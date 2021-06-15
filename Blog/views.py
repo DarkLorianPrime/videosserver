@@ -2,8 +2,8 @@ import requests
 from django.shortcuts import render, get_object_or_404, redirect
 
 from Blog import models
-from Blog.Form import FilmForm, NewNameForm, NewStyleForm
-from Blog.models import Post
+from Blog.Form import FilmForm, NewNameForm, NewStyleForm, RatingForm
+from Blog.models import Post, rating
 from extras.check_person import get_login
 
 
@@ -129,17 +129,29 @@ def post_list(request):
 
 
 def post_one(request, post):
+    integ, integ_sum, dict_for_sum = 0, 0, {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0}
+    form = RatingForm()
     poster, text = get_object_or_404(Post, slug=post), get_login(request)
     login_name, admin = False, False
     if text[0] is not False:
         login_name = text[0].username
     if text[1] is not False or text[2] is not False:
         admin = True
+    rating_user = rating.objects.filter(name=post, username=login_name).first()
+    if rating_user is None:
         if request.method == 'POST':
-            post = Post.objects.filter(slug=post).first()
-            if post is not None:
-                post.delete()
-            return redirect('/')
+                form = RatingForm(request.POST)
+                if form.is_valid():
+                    stars = form.cleaned_data
+                    rating(name=post, username=login_name, stars=stars['like']).save()
+    else:
+        form = True
+    rating_all = rating.objects.all()
+    for i in rating_all:
+        dict_for_sum[str(i.stars)] = dict_for_sum[str(i.stars)] + 1
+        integ += int(i.stars)
+        integ_sum += 1
+    dict_for_sum['all'] = integ / integ_sum
     actors_list, producers_list = [], []
     for i in poster.producer.values():
         producers_list.append(i)
@@ -147,4 +159,4 @@ def post_one(request, post):
         actors_list.append(i)
     producers, actors = ', '.join(producers_list), ', '.join(actors_list)
     return render(request, 'blog/post/detail.html',
-                  {'post': post, 'login_name': login_name, 'actors': actors, 'prods': producers, 'admin': admin})
+                  {'post': poster, 'login_name': login_name, 'actors': actors, 'prods': producers, 'admin': admin, 'form': form, 'RatingAll': dict_for_sum})
