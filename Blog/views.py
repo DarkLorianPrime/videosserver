@@ -105,7 +105,6 @@ def new_film(request):
             photo = returned['art_link']
             if returned['art_link'] == '':
                 photo = requests.get(f'https://imdb-api.com/API/SearchTitle/k_hfcfkmgb/{returned["Title"]}').json()['results']
-                print(photo)
                 if photo:
                     photo = photo[0]['image']
             models.Post(title=returned['Title'], producer=dictes_for_prods, actors=dictes_for_actors,
@@ -127,7 +126,7 @@ def post_list(request):
 
 
 def post_one(request, post):
-    post, text = get_object_or_404(Post, slug=post), get_login(request)
+    poster, text = get_object_or_404(Post, slug=post), get_login(request)
     login_name, admin = False, False
     if text[0] is not False:
         login_name = text[0].username
@@ -139,10 +138,9 @@ def post_one(request, post):
                 post.delete()
             return redirect('/')
     actors_list, producers_list = [], []
-    print(post.producer.values())
-    for i in post.producer.values():
+    for i in poster.producer.values():
         producers_list.append(i)
-    for i in post.actors.values():
+    for i in poster.actors.values():
         actors_list.append(i)
     producers, actors = ', '.join(producers_list), ', '.join(actors_list)
     return render(request, 'blog/post/detail.html', {'post': post, 'login_name': login_name, 'actors': actors, 'prods': producers, 'admin': admin})
