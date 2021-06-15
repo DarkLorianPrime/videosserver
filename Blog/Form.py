@@ -2,6 +2,12 @@ from django import forms
 from .models import actors, prod, styles
 
 
+class FiltersForm(forms.Form):
+    actor = forms.ModelChoiceField(required=False, queryset=actors.objects.all())
+    producer = forms.ModelChoiceField(required=False, queryset=prod.objects.all())
+    names = forms.CharField(required=False)
+
+
 class FilmForm(forms.Form):
     Title = forms.CharField(max_length=100, label='', )
     actors = forms.ModelMultipleChoiceField(queryset=actors.objects.all())

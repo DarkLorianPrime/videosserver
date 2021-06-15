@@ -1,9 +1,10 @@
 import requests
+from django.contrib.auth.models import User
 from django.shortcuts import render, get_object_or_404, redirect
 
 from Blog import models
-from Blog.Form import FilmForm, NewNameForm, NewStyleForm, RatingForm
-from Blog.models import Post, rating
+from Blog.Form import FilmForm, NewNameForm, NewStyleForm, RatingForm, FiltersForm
+from Blog.models import Post, rating, actors, prod
 from extras.check_person import get_login
 
 
@@ -86,8 +87,46 @@ def new_style(request):
                   {'admin': True, 'login_name': login_name, 'form': form, 'who': 'style'})
 
 
+def filters(request):
+    text, form, login_name, actor, prod, admin, er_l, list_find = get_login(
+        request), FiltersForm(), False, False, False, False, False, []
+    if text[0] is not False:
+        login_name = text[0].username
+    if text[1] is not False or text[2] is not False:
+        admin = True
+    if request.method == 'POST':
+        form = FiltersForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            if cd['names'] != '':
+                returned = Post.objects.filter(title__startswith=cd['names']).first()
+                if returned is not None:
+                    return redirect(f'/{returned.slug}')
+                else:
+                    er_l = True
+            all_posts = Post.objects.all()
+            for i in all_posts:
+                for z in i.actors.values():
+                    print(z, cd['actor'])
+                    if z == str(cd['actor']):
+                        print('Проверку прошел!')
+                        list_find.append(i)
+                for z in i.producer.values():
+                    if z == str(cd['producer']):
+                        if i in list_find:
+                            continue
+                        list_find.append(i)
+            print(list_find)
+            if list_find:
+                return render(request, 'blog/post/list.html', {'posts': list_find})
+
+    return render(request, 'blog/post/filters.html',
+                  {'form': form, 'login_name': login_name, 'admin': admin, 'error_local': er_l})
+
+
 def new_film(request):
-    dictes_for_actors, dictes_for_prods, z, w, form, text, login_name, admin = {}, {}, 0, 0, FilmForm(), get_login(request), False, False
+    dictes_for_actors, dictes_for_prods, z, w, form, text, login_name, admin = {}, {}, 0, 0, FilmForm(), get_login(
+        request), False, False
     if text[0] is not False:
         login_name = text[0].username
     if text[2] is False:
@@ -140,10 +179,10 @@ def post_one(request, post):
     rating_user = rating.objects.filter(name=post, username=login_name).first()
     if rating_user is None:
         if request.method == 'POST':
-                form = RatingForm(request.POST)
-                if form.is_valid():
-                    stars = form.cleaned_data
-                    rating(name=post, username=login_name, stars=stars['like']).save()
+            form = RatingForm(request.POST)
+            if form.is_valid():
+                stars = form.cleaned_data
+                rating(name=post, username=login_name, stars=stars['like']).save()
     else:
         form = True
     rating_all = rating.objects.all()
@@ -159,4 +198,5 @@ def post_one(request, post):
         actors_list.append(i)
     producers, actors = ', '.join(producers_list), ', '.join(actors_list)
     return render(request, 'blog/post/detail.html',
-                  {'post': poster, 'login_name': login_name, 'actors': actors, 'prods': producers, 'admin': admin, 'form': form, 'RatingAll': dict_for_sum})
+                  {'post': poster, 'login_name': login_name, 'actors': actors, 'prods': producers, 'admin': admin,
+                   'form': form, 'RatingAll': dict_for_sum})
