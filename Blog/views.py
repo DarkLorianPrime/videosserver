@@ -13,7 +13,7 @@ def new_prod(request):
     login_name = False
     if text[0] is not False:
         login_name = text[0].username
-    if text[1] is False or text[2] is False:
+    if text[2] is False:
         return render(request, 'blog/post/new_prod.html', {'error': True})
     if request.method == 'POST':
         form = NewNameForm(request.POST)
@@ -23,7 +23,8 @@ def new_prod(request):
             if filters is not None:
                 return render(request, 'blog/post/new_prod.html', {'form': form, 'loggined': True})
             models.prod(name=returned['Name']).save()
-    return render(request, 'blog/post/new_prod.html', {'form': form, 'who': 'producer', 'login_name': login_name, 'admin': True})
+    return render(request, 'blog/post/new_prod.html',
+                  {'form': form, 'who': 'producer', 'login_name': login_name, 'admin': True})
 
 
 def new_actor(request):
@@ -40,9 +41,11 @@ def new_actor(request):
             returned = form.cleaned_data
             filters = models.actors.objects.filter(name=returned['Name']).first()
             if filters is not None:
-                return render(request, 'blog/post/new_prod.html', {'form': form, 'loggined': True, 'admin': True, 'who': 'actor', 'login_name': login_name})
+                return render(request, 'blog/post/new_prod.html',
+                              {'form': form, 'loggined': True, 'admin': True, 'who': 'actor', 'login_name': login_name})
             models.actors(name=returned['Name']).save()
-    return render(request, 'blog/post/new_prod.html', {'form': form, 'who': 'actor', 'login_name': login_name, 'admin': True})
+    return render(request, 'blog/post/new_prod.html',
+                  {'form': form, 'who': 'actor', 'login_name': login_name, 'admin': True})
 
 
 def moderPanel(request):
@@ -69,26 +72,25 @@ def new_style(request):
     login_name, admin, text, form = False, False, get_login(request), NewStyleForm()
     if text[0] is not False:
         login_name = text[0].username
-    if text[1] is False:
+    if text[2] is False:
         return render(request, 'blog/post/new_film.html', {'error': True})
     if request.method == 'POST':
         form = NewStyleForm(request.POST)
         if form.is_valid():
             returned = form.cleaned_data
             if models.styles.objects.filter(style=returned['Name']).first() is not None:
-                return render(request, 'blog/post/new_prod.html', {'form': form, 'loggined': True, 'admin': True, 'who': 'style', 'login_name': login_name})
+                return render(request, 'blog/post/new_prod.html',
+                              {'form': form, 'loggined': True, 'admin': True, 'who': 'style', 'login_name': login_name})
             models.styles(style=returned['Name']).save()
-    return render(request, 'blog/post/new_prod.html', {'admin': True, 'login_name': login_name, 'form': form, 'who': 'style'})
+    return render(request, 'blog/post/new_prod.html',
+                  {'admin': True, 'login_name': login_name, 'form': form, 'who': 'style'})
 
 
 def new_film(request):
-    form = FilmForm()
-    dictes_for_actors, dictes_for_prods, z, w = {}, {}, 0, 0
-    text = get_login(request)
-    login_name, admin = False, False
+    dictes_for_actors, dictes_for_prods, z, w, form, text, login_name, admin = {}, {}, 0, 0, FilmForm(), get_login(request), False, False
     if text[0] is not False:
         login_name = text[0].username
-    if text[1] is False:
+    if text[2] is False:
         return render(request, 'blog/post/new_film.html', {'error': True})
     if request.method == 'POST':
         form = FilmForm(request.POST)
@@ -100,11 +102,12 @@ def new_film(request):
                 dictes_for_actors[str(z)] = str(i)
                 z += 1
             for i in returned['prod']:
-                dictes_for_prods[str(z)] = str(i)
+                dictes_for_prods[str(w)] = str(i)
                 w += 1
             photo = returned['art_link']
             if returned['art_link'] == '':
-                photo = requests.get(f'https://imdb-api.com/API/SearchTitle/k_hfcfkmgb/{returned["Title"]}').json()['results']
+                photo = requests.get(f'https://imdb-api.com/API/SearchTitle/k_hfcfkmgb/{returned["Title"]}').json()[
+                    'results']
                 if photo:
                     photo = photo[0]['image']
             models.Post(title=returned['Title'], producer=dictes_for_prods, actors=dictes_for_actors,
@@ -143,4 +146,5 @@ def post_one(request, post):
     for i in poster.actors.values():
         actors_list.append(i)
     producers, actors = ', '.join(producers_list), ', '.join(actors_list)
-    return render(request, 'blog/post/detail.html', {'post': post, 'login_name': login_name, 'actors': actors, 'prods': producers, 'admin': admin})
+    return render(request, 'blog/post/detail.html',
+                  {'post': post, 'login_name': login_name, 'actors': actors, 'prods': producers, 'admin': admin})

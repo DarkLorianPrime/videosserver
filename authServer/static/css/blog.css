@@ -155,7 +155,7 @@ option, option:focus {
     border: 1px solid red;
     background-color: rgba(255,255,255,0.1);
 }
-#id_Title, #id_style, #id_art_link, #id_Name, #id_slug, #id_nick  {
+#id_Title, #id_style, #id_art_link, #id_Name, #id_slug, #id_nick, #id_name  {
     background-color: rgba(255,255,255,0.1);
     border: 0;
     border-left: 1px solid red;

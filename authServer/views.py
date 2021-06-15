@@ -5,10 +5,62 @@ from django.shortcuts import render, redirect
 
 from extras.check_person import get_login
 from .models import cookie_saves, not_Admin, Admin, not_Moderator, Moderator
-from .Form import LoginForm, RegistrationForm, new_adminForm, new_moderForm
+from .Form import LoginForm, RegistrationForm, new_adminForm, new_moderForm, DelUserForm, ModerDeleteForm, \
+    AdminDeleteForm
+
+
+def del_user(request):
+    form, text = DelUserForm(), get_login(request)
+    if text[2] is False:
+        return render(request, 'blog/post/deluser.html', {'error': True})
+    if request.method == 'POST':
+        form = DelUserForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            user = User.objects.filter(username=cd['name']).first()
+            if user is not None:
+                user.delete()
+                not_Moderator.objects.filter(name=cd['name']).first().delete()
+                not_admin = not_Admin.objects.filter(name=cd['name']).first()
+                if not_admin is not None:
+                    not_admin.delete()
+    return render(request, 'blog/post/deluser.html', {'form': form, 'who': 'user'})
+
+
+def del_moderator(request):
+    form, text = ModerDeleteForm(), get_login(request)
+    if text[1] is False:
+        return render(request, 'blog/post/deluser.html', {'error': True})
+    if request.method == 'POST':
+        form = ModerDeleteForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            find = Moderator.objects.filter(name=cd['name']).first()
+            if find is not None:
+                find.delete()
+                not_Moderator(name=cd['name']).save()
+    return render(request, 'blog/post/deluser.html', {'form': form, 'who': 'moderator'})
+
+
+def del_administrator(request):
+    form, text = AdminDeleteForm(), get_login(request)
+    if text[1] is False:
+        return render(request, 'blog/post/deluser.html', {'error': True})
+    if request.method == 'POST':
+        form = AdminDeleteForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            find = Admin.objects.filter(name=cd['name']).first()
+            if find is not None:
+                find.delete()
+                not_Admin(name=cd['name']).save()
+    return render(request, 'blog/post/deluser.html', {'form': form, 'who': 'administrator'})
 
 
 def auth(request):
+    form = LoginForm()
+    if get_login(request)[0] is not False:
+        return redirect('/')
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid():
@@ -24,10 +76,6 @@ def auth(request):
                 cookie_saves(cookie_user_id=obj.id, cookie_user_token=data).save()
                 red.set_cookie(key='loggined_token', value=data, max_age=100000)
             return red
-    else:
-        if get_login(request)[0] is not False:
-            return redirect('/')
-        form = LoginForm()
     return render(request, 'blog/post/share.html', {'form': form, 'loggined': False})
 
 
@@ -39,7 +87,7 @@ def profile(request):
 
 
 def registration(request):
-    form = RegistrationForm()
+    form, loggined = RegistrationForm(), False
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
         if form.is_valid():
@@ -55,12 +103,9 @@ def registration(request):
             not_Moderator(name=cd['login']).save()
             red.set_cookie(key='loggined_token', value=data, max_age=100000)
             return red
-        else:
-            loggined = True
-    else:
-        if get_login(request)[0] is not False:
-            return redirect('/')
-        loggined = False
+        loggined = True
+    if get_login(request)[0] is not False:
+        return redirect('/')
     return render(request, 'blog/post/registration.html', {'form': form, 'loggined': loggined})
 
 
@@ -73,10 +118,9 @@ def add_moderator(request):
             not_Moderator.objects.get(name=returned['nick']).delete()
             Moderator(name=returned['nick']).save()
     text = get_login(request)
-    if text[0] is False or text[1] is False:
+    if text[1] is False:
         return render(request, 'blog/post/new_admin.html', {'error': True})
-    loggined = True
-    return render(request, 'blog/post/new_admin.html', {'form': form, 'loggined': loggined, 'new': 'moderator'})
+    return render(request, 'blog/post/new_admin.html', {'form': form, 'loggined': True, 'new': 'moderator'})
 
 
 def add_admin(request):
@@ -90,7 +134,7 @@ def add_admin(request):
             not_Moderator.objects.get(name=returned['nick']).delete()
             Moderator(name=returned['nick']).save()
     text = get_login(request)
-    if text[0] is False or text[1] is False:
+    if text[1] is False:
         return render(request, 'blog/post/new_admin.html', {'error': True})
     return render(request, 'blog/post/new_admin.html', {'form': form, 'loggined': True, 'new': 'administrator'})
 
