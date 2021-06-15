@@ -17,6 +17,15 @@ class actors(models.Model):
         return self.name
 
 
+class rating(models.Model):
+    name = models.CharField(max_length=100)
+    stars = models.IntegerField()
+    username = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+
 class styles(models.Model):
     style = models.CharField(max_length=100)
 

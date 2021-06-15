@@ -18,3 +18,8 @@ class NewStyleForm(forms.Form):
 
 class NewNameForm(forms.Form):
     Name = forms.CharField(max_length=100, label='', widget=forms.TextInput)
+
+
+class RatingForm(forms.Form):
+    CHOICES = [('1', '1'), ('2', '2'), ('3', '3'), ('4', '4'), ('5', '5')]
+    like = forms.ChoiceField(choices=CHOICES, widget=forms.RadioSelect, )

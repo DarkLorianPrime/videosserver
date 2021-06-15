@@ -155,7 +155,7 @@ option, option:focus {
     border: 1px solid red;
     background-color: rgba(255,255,255,0.1);
 }
-#id_Title, #id_style, #id_art_link, #id_Name, #id_slug, #id_nick  {
+#id_Title, #id_style, #id_art_link, #id_Name, #id_slug, #id_nick, #id_name  {
     background-color: rgba(255,255,255,0.1);
     border: 0;
     border-left: 1px solid red;
@@ -164,6 +164,13 @@ option, option:focus {
 }
 #id_style{
     width: 150px;
+}
+#id_Raiting {
+border: 0;
+background-color: rgba(255,255,255,0);
+border-bottom: 3px solid red;
+width: 50px;
+font-size: 24px;
 }
 input:focus,
 select:focus,
@@ -175,6 +182,33 @@ button:focus {
 .bg {
 background-color: rgba(255,255,255,0.7);
 display: block;
+}
+.l_box1 {
+overflow: hidden;
+background-color: red;
+font-size: 1px;
+width: 100px;
+}
+[id^=id_like_] {
+display: none
+}
+[id^=id_like_] + label {
+  display: inline-block;
+  vertical-align: middle;
+  font-size: 50px;
+  color: #555;
+  cursor: pointer;
+}
+#id_like_0:checked + label {
+    background-color: tomato;
+}
+[id^=id_like_]:checked + label {
+  background-color: tomato;
+  cursor: text;
+  width: 10px;
+}
+.img_rate {
+width: 50px;
 }
 .center_reg {
     margin-left: 50%;
@@ -223,11 +257,6 @@ h1 {
 .info {
     color: grey;
 }
-
-.comment:nth-child(even) {
-    background-color: whitesmoke;
-}
-
 #content,
 #sidebar {
   float: left;

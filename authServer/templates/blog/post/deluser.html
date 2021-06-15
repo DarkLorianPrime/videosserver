@@ -1,0 +1,17 @@
+{% extends "blog/base_to_login.html" %}
+
+{% block title %}Delete {{who}}{% endblock %}
+
+{% block content %}
+{% if error != True %}
+<div class="center_reg">
+    <p>Delete {{who}}</p>
+    <form method="post">
+        {{ form.name }}
+        {% csrf_token %}
+        <p><a class="Back" href="/">>>Back</a></p>
+        <p><input class="input_button" type="submit" value="Delete this {{who}}"></p>
+    </form>
+</div>
+{% endif %}
+{% endblock %}
