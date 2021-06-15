@@ -38,7 +38,7 @@ def del_moderator(request):
             find = Moderator.objects.filter(name=cd['name']).first()
             if find is not None:
                 find.delete()
-                not_Moderator(name=cd['name']).save()
+                not_Moderator.objects.create(name=cd['name'])
     return render(request, 'blog/post/deluser.html', {'form': form, 'who': 'moderator'})
 
 
@@ -53,7 +53,7 @@ def del_administrator(request):
             find = Admin.objects.filter(name=cd['name']).first()
             if find is not None:
                 find.delete()
-                not_Admin(name=cd['name']).save()
+                not_Admin.objects.create(name=cd['name'])
     return render(request, 'blog/post/deluser.html', {'form': form, 'who': 'administrator'})
 
 
@@ -73,7 +73,7 @@ def auth(request):
             data = uuid.uuid4().hex
             red = redirect('/')
             if cookie_saves.objects.filter(cookie_user_id=obj.id).first() is None:
-                cookie_saves(cookie_user_id=obj.id, cookie_user_token=data).save()
+                cookie_saves.objects.create(cookie_user_id=obj.id, cookie_user_token=data)
                 red.set_cookie(key='loggined_token', value=data, max_age=100000)
             return red
     return render(request, 'blog/post/share.html', {'form': form, 'loggined': False})
@@ -99,12 +99,11 @@ def registration(request):
             print(cd['password'], cd['login'])
             User.objects.create_user(username=cd['login'], password=cd['password'], email=cd['email']).save()
             data, red, obj = uuid.uuid4().hex, redirect('/'), User.objects.filter(username=cd['login']).first()
-            cookie_saves(cookie_user_id=obj.id, cookie_user_token=data).save()
-            not_Admin(name=cd['login']).save()
-            not_Moderator(name=cd['login']).save()
+            cookie_saves.objects.create(cookie_user_id=obj.id, cookie_user_token=data)
+            not_Admin.objects.create(name=cd['login'])
+            not_Moderator.objects.create(name=cd['login'])
             red.set_cookie(key='loggined_token', value=data, max_age=100000)
             return red
-        print(form.errors)
         loggined = True
     if get_login(request)[0] is not False:
         return redirect('/')
@@ -118,7 +117,7 @@ def add_moderator(request):
         if form.is_valid():
             returned = form.cleaned_data
             not_Moderator.objects.get(name=returned['nick']).delete()
-            Moderator(name=returned['nick']).save()
+            Moderator.objects.create(name=returned['nick'])
     text = get_login(request)
     if text[1] is False:
         return render(request, 'blog/post/new_admin.html', {'error': True})
@@ -132,9 +131,9 @@ def add_admin(request):
         if form.is_valid():
             returned = form.cleaned_data
             not_Admin.objects.get(name=returned['nick']).delete()
-            Admin(name=returned['nick']).save()
+            Admin.objects.create(name=returned['nick'])
             not_Moderator.objects.get(name=returned['nick']).delete()
-            Moderator(name=returned['nick']).save()
+            Moderator.objects.create(name=returned['nick'])
     text = get_login(request)
     if text[1] is False:
         return render(request, 'blog/post/new_admin.html', {'error': True})

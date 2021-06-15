@@ -3,21 +3,21 @@ from django.utils import timezone
 from django.db import models
 
 
-class prod(models.Model):
+class Prod(models.Model):
     name = models.CharField(max_length=100)
 
     def __str__(self):
         return self.name
 
 
-class actors(models.Model):
+class Actors(models.Model):
     name = models.CharField(max_length=100)
 
     def __str__(self):
         return self.name
 
 
-class rating(models.Model):
+class Rating(models.Model):
     name = models.CharField(max_length=100)
     stars = models.IntegerField()
     username = models.CharField(max_length=100)
@@ -26,7 +26,7 @@ class rating(models.Model):
         return self.name
 
 
-class styles(models.Model):
+class Styles(models.Model):
     style = models.CharField(max_length=100)
 
     def __str__(self):

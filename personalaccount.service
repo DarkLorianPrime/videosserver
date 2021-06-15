@@ -1,0 +1,13 @@
+[Unit]
+Description=Bord service
+After=network.target
+
+[Service]
+User=root
+Group=www-data
+WorkingDirectory=/root/Energy
+Environment="PATH=/root/myenv/bin"
+ExecStart=/usr/bin/gunicorn --workers 3 --bind unix:personalaccount.sock -m 007 wsgi:app
+
+[Install]
+WantedBy=multi-user.target
