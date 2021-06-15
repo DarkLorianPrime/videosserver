@@ -96,6 +96,7 @@ def registration(request):
                 return render(request, 'blog/post/registration.html', {'form': form, 'loggined': 'Login'})
             if User.objects.filter(email=cd['email']).first() is not None:
                 return render(request, 'blog/post/registration.html', {'form': form, 'loggined': 'Email'})
+            print(cd['password'], cd['login'])
             User.objects.create_user(username=cd['login'], password=cd['password'], email=cd['email']).save()
             data, red, obj = uuid.uuid4().hex, redirect('/'), User.objects.filter(username=cd['login']).first()
             cookie_saves(cookie_user_id=obj.id, cookie_user_token=data).save()
@@ -103,6 +104,7 @@ def registration(request):
             not_Moderator(name=cd['login']).save()
             red.set_cookie(key='loggined_token', value=data, max_age=100000)
             return red
+        print(form.errors)
         loggined = True
     if get_login(request)[0] is not False:
         return redirect('/')
