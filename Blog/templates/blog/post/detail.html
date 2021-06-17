@@ -25,10 +25,7 @@
         <br>
     </div>
     {% if admin == True %}
-    <form method="post">
-        <button class="menu_button button">Delete this page</button>
-        {% csrf_token %}
-    </form>
+    <a class="menu_button button" href="delete">Delete this page</a>
     {% endif %}
     <p><img class="img_rate" src="{% static 'photos/star-fill.png' %}">All:{{RatingAll.all}}</p>
     <p><img class="img_rate" src="{% static 'photos/star-fill.png' %}">1: {{RatingAll.1}}</p>

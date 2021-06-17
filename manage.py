@@ -6,6 +6,8 @@ import sys
 
 def main():
     """Run administrative tasks."""
+    sys.path.append('authServer')
+    sys.path.append('Blog')
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'videosserver.settings')
     try:
         from django.core.management import execute_from_command_line
