@@ -49,6 +49,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'extras.middleware_proccesor.GetUser',
+    'extras.middleware_is_admin.Is_Admin',
+    'extras.middleware_is_moder.Is_Moder',
+    'extras.middleware_has_anypermissions.Is_anypermissions'
 ]
 
 ROOT_URLCONF = 'videosserver.urls'

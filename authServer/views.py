@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 
 from extras.authentication import BackendAuth
-from .Form import RegistrationForm, LoginForm, new_moderForm, new_adminForm
+from .Form import RegistrationForm, LoginForm, new_moderForm, new_adminForm, AdminDeleteForm, ModerDeleteForm
 from .models import cookie_saves, Admin, Moderator, Role
 
 
@@ -12,7 +12,7 @@ from .models import cookie_saves, Admin, Moderator, Role
 
 def del_user(request):
     form, text = DelUserForm(), get_login(request)
-    if text[2] is False:
+    if request.is_moderator:
         return render(request, 'blog/post/deluser.html', {'error': True})
     if request.method == 'POST':
         form = DelUserForm(request.POST)
@@ -29,8 +29,8 @@ def del_user(request):
 
 
 def del_moderator(request):
-    form, text = ModerDeleteForm(), get_login(request)
-    if text[1] is False:
+    form = ModerDeleteForm()  # Need fix!
+    if not request.is_administrator:
         return render(request, 'blog/post/deluser.html', {'error': True})
     if request.method == 'POST':
         form = ModerDeleteForm(request.POST)
@@ -44,8 +44,8 @@ def del_moderator(request):
 
 
 def del_administrator(request):
-    form, text = AdminDeleteForm(), get_login(request)
-    if text[1] is False:
+    form = AdminDeleteForm()  # Need fix!
+    if not request.is_administrator:
         return render(request, 'blog/post/deluser.html', {'error': True})
     if request.method == 'POST':
         form = AdminDeleteForm(request.POST)
@@ -54,21 +54,18 @@ def del_administrator(request):
             find = Admin.objects.filter(name=cd['name']).first()
             if find is not None:
                 find.delete()
-                # not_Admin.objects.create(name=cd['name'])
     return render(request, 'blog/post/deluser.html', {'form': form, 'who': 'administrator'})
 
 
 def auth(request):
-    if BackendAuth().get_user(request.COOKIES.get('loggined_token')) is not None:
+    if request.Auth_user is not None:
         return redirect('/')
-    trouble = False
-    form = LoginForm()
+    form, trouble = LoginForm(), False
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid():
             cd = form.cleaned_data
-            Login_return = BackendAuth().authenticate(request=request, username=cd['login'], password=cd['password'],
-                                                      email=cd['email'])
+            Login_return = BackendAuth().authenticate(request=request, username=cd['login'], password=cd['password'])
             if not Login_return.get('error'):
                 return Login_return
             trouble = True
@@ -76,14 +73,15 @@ def auth(request):
 
 
 def profile(request):
-    text = get_login(request)
-    if text[0] is False:
-        return render(request, 'blog/get/profile.html', {'error': True})
-    return render(request, 'blog/get/profile.html', {'user': text[0], 'ToFAdm': text[1], 'ToFModer': text[2]})
+    administrator = BackendAuth().is_Administrator(request)
+    moderator = BackendAuth().is_Moderator(request)
+    return render(request, 'blog/get/profile.html', {'ToFAdm': administrator, 'ToFModer': moderator, 'error': False})
 
 
 def registration(request):
     form, trouble = RegistrationForm(), False
+    if request.Auth_user is not None:
+        return redirect('/')
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
         if form.is_valid():
@@ -97,9 +95,7 @@ def registration(request):
                 trouble = 'Email'
             else:
                 return Registration_return
-    if BackendAuth().get_user(request.COOKIES.get('loggined_token')) is not None:
-        return redirect('/')
-    return render(request, 'blog/post/registration.html', {'form': form, 'trouble': trouble})
+    return render(request, 'blog/post/registration.html', {'form': form, 'trouble': trouble, 'error': False})
 
 
 def add_moderator(request):
@@ -108,36 +104,29 @@ def add_moderator(request):
         form = new_moderForm(request.POST)
         if form.is_valid():
             returned = form.cleaned_data
-            # not_Moderator.objects.get(name=returned['nick']).delete()
             Moderator.objects.create(name=returned['nick'])
-    text = get_login(request)
-    if text[1] is False:
+    if not request.is_administrator:
         return render(request, 'blog/post/new_admin.html', {'error': True})
     return render(request, 'blog/post/new_admin.html', {'form': form, 'loggined': True, 'new': 'moderator'})
 
 
 def add_admin(request):
-    user = BackendAuth().get_user(request.COOKIES.get('loggined_token'))
+    if not BackendAuth().is_Administrator(request):
+        return render(request, 'blog/post/new_admin.html', {'error': True})
     form = new_adminForm()
-    print(user)
-    if user is None:
-        print(1)
     if request.method == 'POST':
         form = new_adminForm(request.POST)
         if form.is_valid():
             returned = form.cleaned_data
-            if user is not None:
-                User_Model = User.objects.filter(username=returned['nick'])
-                Role_selected = Role.objects.filter(name='Administrator', Users=User_Model)
-                Role_selected_Mod = Role.objects.filter(name='Moderator', Users=User_Model)
-                if not Role_selected.is_Role:
-                    Role_selected.is_Role = True
-                    Role_selected.save()
-                if not Role_selected_Mod.is_Role:
-                    Role_selected_Mod.is_Role = True
-                    Role_selected_Mod.save()
-    if user is None:
-        return render(request, 'blog/post/new_admin.html', {'error': True})
+            User_Model = User.objects.filter(username=returned['nick'])
+            Role_selected = Role.objects.filter(name='Administrator', Users=User_Model)
+            Role_selected_Mod = Role.objects.filter(name='Moderator', Users=User_Model)
+            if not Role_selected.is_Role:
+                Role_selected.is_Role = True
+                Role_selected.save()
+            if not Role_selected_Mod.is_Role:
+                Role_selected_Mod.is_Role = True
+                Role_selected_Mod.save()
     return render(request, 'blog/post/new_admin.html', {'form': form, 'loggined': True, 'new': 'administrator'})
 
 
@@ -148,3 +137,4 @@ def logout(request):
         req = redirect('/login/')
         req.delete_cookie('loggined_token')
         return req
+    return redirect('/')

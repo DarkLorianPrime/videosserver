@@ -21,11 +21,11 @@ class LoginForm(forms.Form):
 
 
 class new_adminForm(forms.Form):
-    nick = forms.ModelChoiceField(queryset=Role.objects.all().filter(name='Administrator'))
+    nick = forms.ModelChoiceField(queryset=Role.objects.all().filter(name='Administrator', is_Role=False))
 
 
 class new_moderForm(forms.Form):
-    nick = forms.ModelChoiceField(queryset=Role.objects.all())
+    nick = forms.ModelChoiceField(queryset=Role.objects.all().filter(name='Moderator', is_Role=False))
 
 
 class RegistrationForm(forms.Form):

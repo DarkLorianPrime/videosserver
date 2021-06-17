@@ -1,20 +1,17 @@
 import requests
-from django.contrib.auth.models import User
 from django.shortcuts import render, get_object_or_404, redirect
 
 from Blog.Form import FilmForm, NewNameForm, NewStyleForm, RatingForm, FiltersForm
 from Blog.models import Post, Rating, Actors, Prod, Styles
-from authServer.models import Moderator, Admin, Role
 from extras.authentication import BackendAuth
 
 
 def new_prod(request):
     form = NewNameForm()
-    text = get_login(request)
     login_name = False
-    if text[0] is not False:
-        login_name = text[0].username
-    if text[2] is False:
+    if request.Auth_user is not None:
+        login_name = request.Auth_user.username
+    if not request.Is_Anypermissions:
         return render(request, 'blog/post/new_prod.html', {'error': True})
     if request.method == 'POST':
         form = NewNameForm.objects.create(request.POST)
@@ -30,11 +27,8 @@ def new_prod(request):
 
 def new_actor(request):
     form = NewNameForm()
-    text = get_login(request)
     login_name = False
-    if text[0] is not False:
-        login_name = text[0].username
-    if text[2] is False:
+    if not request.Is_Anypermissions:
         return render(request, 'blog/post/new_prod.html', {'error': True})
     if request.method == 'POST':
         form = NewNameForm.objects.create(request.POST)
@@ -46,34 +40,24 @@ def new_actor(request):
                               {'form': form, 'loggined': True, 'admin': True, 'who': 'actor', 'login_name': login_name})
             Actors.objects.create(name=returned['Name'])
     return render(request, 'blog/post/new_prod.html',
-                  {'form': form, 'who': 'actor', 'login_name': login_name, 'admin': True})
+                  {'form': form, 'who': 'actor', 'admin': True})
 
 
 def moderPanel(request):
-    text = get_login(request)
-    login_name = False
-    if text[0] is not False:
-        login_name = text[0].username
-    if text[2] is False:
+    if not request.Is_Anypermissions:
         return render(request, 'blog/post/moderPanel.html', {'error': True})
-    return render(request, 'blog/post/moderPanel.html', {'login_name': login_name, 'admin': True})
+    return render(request, 'blog/post/moderPanel.html', {'admin': True})
 
 
 def adminPanel(request):
-    text = get_login(request)
-    login_name = False
-    if text[0] is not False:
-        login_name = text[0].username
-    if text[1] is False:
-        return render(request, 'blog/post/moderPanel.html', {'error': True})
-    return render(request, 'blog/post/adminPanel.html', {'login_name': login_name, 'admin': True})
+    if not request.is_administrator:
+        return render(request, 'blog/post/adminPanel.html', {'error': True})
+    return render(request, 'blog/post/adminPanel.html', {'admin': True})
 
 
 def new_style(request):
-    login_name, admin, text, form = False, False, get_login(request), NewStyleForm()
-    if text[0] is not False:
-        login_name = text[0].username
-    if text[2] is False:
+    admin, form = False, NewStyleForm()
+    if not request.Is_Anypermissions:
         return render(request, 'blog/post/new_film.html', {'error': True})
     if request.method == 'POST':
         form = NewStyleForm(request.POST)
@@ -81,18 +65,16 @@ def new_style(request):
             returned = form.cleaned_data
             if Styles.objects.filter(style=returned['Name']).first() is not None:
                 return render(request, 'blog/post/new_prod.html',
-                              {'form': form, 'loggined': True, 'admin': True, 'who': 'style', 'login_name': login_name})
-            Styles(style=returned['Name'])
-    return render(request, 'blog/post/new_prod.html',
-                  {'admin': True, 'login_name': login_name, 'form': form, 'who': 'style'})
+                              {'form': form, 'loggined': True, 'admin': True, 'who': 'style'})
+            Styles.objects.create(style=returned['Name'])
+    return render(request, 'blog/post/new_prod.html', {'admin': True, 'form': form, 'who': 'style'})
 
 
 def filters(request):
-    text, form, login_name, actor, prod, admin, er_l, list_find = get_login(
-        request), FiltersForm(), False, False, False, False, False, []
-    if text[0] is not False:
-        login_name = text[0].username
-    if text[1] is not False or text[2] is not False:
+    form, login_name, actor, prod, admin, er_l, list_find = FiltersForm(), False, False, False, False, False, []
+    if request.Auth_user is not None:
+        login_name = request.Auth_user.username
+    if not request.Is_Anypermissions:
         admin = True
     if request.method == 'POST':
         form = FiltersForm(request.POST)
@@ -121,11 +103,10 @@ def filters(request):
 
 
 def new_film(request):
-    dictes_for_Actors, dictes_for_prods, int_for_actors, int_for_prods, form, text, login_name, admin = {}, {}, 0, 0, FilmForm(), get_login(
-        request), False, False
-    if text[0] is not False:
-        login_name = text[0].username
-    if text[2] is False:
+    dictes_for_Actors, dictes_for_prods, int_for_actors, int_for_prods, form, login_name, admin = {}, {}, 0, 0, FilmForm(), False, False
+    if request.Auth_user is not None:
+        login_name = request.Auth_user.username
+    if not request.Is_Anypermissions:
         return render(request, 'blog/post/new_film.html', {'error': True})
     if request.method == 'POST':
         form = FilmForm(request.POST)
@@ -147,20 +128,18 @@ def new_film(request):
                     photo = photo[0]['image']
             Post.objects.create(title=returned['Title'], producer=dictes_for_prods, actors=dictes_for_Actors,
                                 slug=returned['slug'], description=returned['description'], author='darklorian',
-                                art_link=photo,
-                                style=returned['style'])
+                                art_link=photo, style=returned['style'])
             return redirect('/')
     return render(request, 'blog/post/new_film.html', {'form': form, 'login_name': login_name, 'admin': True})
 
 
 def post_list(request):
     post_listin = Post.objects.all()
-    user = BackendAuth().get_user(request.COOKIES.get('loggined_token'))
     login_name, admin = False, False
-    if user is not None:
-        login_name = user.username
-    print()
-    if Admin.is_admin:
+    if request.Auth_user is not None:
+        login_name = request.Auth_user.username
+    print(request.is_administrator)
+    if request.Is_Anypermissions:
         admin = True
     return render(request, 'blog/post/list.html', {'posts': post_listin, 'login_name': login_name, 'admin': admin})
 
@@ -175,11 +154,9 @@ def post_one(request, post):
     form = RatingForm()
     poster, user = get_object_or_404(Post, slug=post), BackendAuth().get_user(request.COOKIES.get('loggined_token'))
     login_name, admin = False, False
-    if user is not None:
-        login_name = user.username
-    selected_people = Role.objects.filter(Users=user)
-    if selected_people.filter(name='Administrator', is_Role='True').first() is not None or selected_people.filter(
-            name='Moderator', is_Role='True').first() is not None:
+    if request.Auth_user is not None:
+        login_name = request.Auth_user.username
+    if request.Is_Anypermissions:
         admin = True
     rating_user = Rating.objects.filter(name=post, username=login_name).first()
     if rating_user is None:
@@ -191,9 +168,9 @@ def post_one(request, post):
     else:
         form = True
     rating_all = Rating.objects.all().filter(name=post)
-    for i in rating_all:
-        dict_for_sum[str(i.stars)] = dict_for_sum[str(i.stars)] + 1
-        integ += int(i.stars)
+    for rating in rating_all:
+        dict_for_sum[str(rating.stars)] = dict_for_sum[str(rating.stars)] + 1
+        integ += int(rating.stars)
         integ_sum += 1
     if integ_sum != 0:
         dict_for_sum['all'] = integ / integ_sum
@@ -202,7 +179,7 @@ def post_one(request, post):
         producers_list.append(i)
     for i in poster.actors.values():
         Actors_list.append(i)
-    producers, Actors = ', '.join(producers_list), ', '.join(Actors_list)
+    producers, actors = ', '.join(producers_list), ', '.join(Actors_list)
     return render(request, 'blog/post/detail.html',
-                  {'post': poster, 'login_name': login_name, 'Actors': Actors, 'prods': producers, 'admin': admin,
+                  {'post': poster, 'login_name': login_name, 'Actors': actors, 'prods': producers, 'admin': admin,
                    'form': form, 'RatingAll': dict_for_sum})
