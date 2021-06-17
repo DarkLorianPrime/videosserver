@@ -2,16 +2,13 @@ from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 
 from extras.authentication import BackendAuth
-from .Form import RegistrationForm, LoginForm, new_moderForm, new_adminForm, AdminDeleteForm, ModerDeleteForm
-from .models import cookie_saves, Admin, Moderator, Role
-
-
-# from .Form import LoginForm, RegistrationForm, new_adminForm, new_moderForm, DelUserForm, ModerDeleteForm, \
-#     AdminDeleteForm
+from .Form import RegistrationForm, LoginForm, new_moderForm, new_adminForm, AdminDeleteForm, ModerDeleteForm, \
+    DelUserForm
+from .models import cookie_saves, Role
 
 
 def del_user(request):
-    form, text = DelUserForm(), get_login(request)
+    form, text = DelUserForm()
     if request.is_moderator:
         return render(request, 'blog/post/deluser.html', {'error': True})
     if request.method == 'POST':
@@ -21,15 +18,11 @@ def del_user(request):
             user = User.objects.filter(username=cd['name']).first()
             if user is not None:
                 user.delete()
-                # not_Moderator.objects.filter(name=cd['name']).first().delete()
-                # not_admin = not_Admin.objects.filter(name=cd['name']).first()
-                # if not_admin is not None:
-                #     not_admin.delete()
     return render(request, 'blog/post/deluser.html', {'form': form, 'who': 'user'})
 
 
 def del_moderator(request):
-    form = ModerDeleteForm()  # Need fix!
+    form = ModerDeleteForm()
     if not request.is_administrator:
         return render(request, 'blog/post/deluser.html', {'error': True})
     if request.method == 'POST':
@@ -73,8 +66,8 @@ def auth(request):
 
 
 def profile(request):
-    administrator = BackendAuth().is_Administrator(request)
-    moderator = BackendAuth().is_Moderator(request)
+    administrator = request.is_administrator
+    moderator = request.is_moderator
     return render(request, 'blog/get/profile.html', {'ToFAdm': administrator, 'ToFModer': moderator, 'error': False})
 
 
@@ -104,14 +97,18 @@ def add_moderator(request):
         form = new_moderForm(request.POST)
         if form.is_valid():
             returned = form.cleaned_data
-            Moderator.objects.create(name=returned['nick'])
+            User_Model = User.objects.filter(username=returned['nick'])
+            Role_selected = Role.objects.filter(name='Administrator', Users=User_Model)
+            if not Role_selected.is_Role:
+                Role_selected.is_Role = True
+                Role_selected.save()
     if not request.is_administrator:
         return render(request, 'blog/post/new_admin.html', {'error': True})
     return render(request, 'blog/post/new_admin.html', {'form': form, 'loggined': True, 'new': 'moderator'})
 
 
 def add_admin(request):
-    if not BackendAuth().is_Administrator(request):
+    if not request.is_administrator:
         return render(request, 'blog/post/new_admin.html', {'error': True})
     form = new_adminForm()
     if request.method == 'POST':

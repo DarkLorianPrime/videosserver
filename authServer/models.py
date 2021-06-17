@@ -17,20 +17,4 @@ class Role(models.Model):
 
     def __str__(self):
         return str(self.Users)
-
-
-class Moderator(models.Model):
-    name = models.CharField(max_length=255)
-    is_moder = models.BooleanField()
-
-    def __str__(self):
-        return self.name
-
-
-class Admin(models.Model):
-    name = models.CharField(max_length=255)
-    is_admin = models.BooleanField()
-
-    def __str__(self):
-        return self.name
 # Create your models here.
