@@ -115,8 +115,8 @@ def new_film(request):
                                                    description=returned['description'], author='darklorian',
                                                    style=returned['style'])
             for one_in_actors in returned['actors']:
-                selected_actor = Actors.objects.filter(name=one_in_actors).first()
-                Post_to_personal.actors.add(name=selected_actor)
+                selected_actors = Actors.objects.filter(name=one_in_actors).first()
+                Post_to_personal.actors.add(name=selected_actors)
             for one_in_prods in returned['prod']:
                 selected_producer = Prod.objects.filter(name=one_in_prods).first()
                 Post_to_personal.producer.add(name=selected_producer)
