@@ -17,20 +17,28 @@ class BackendAuth(BaseBackend):
             User.objects.create_user(username=username, password=password, email=email).save()
             data_uuid, redirects, obj = uuid.uuid4().hex, redirect('/'), User.objects.filter(username=username).first()
             cookie_saves.objects.create(cookie_user_id=obj.id, cookie_user_token=data_uuid)
-            redirects.set_cookie(key='loggined_token', value=data_uuid, max_age=10000000000)
+            redirects.set_cookie(key='loggined_token', value=data_uuid, max_age=1000000)
             Role.objects.create(name='User', Users=obj, is_Role=True)
             Role.objects.create(name='Administrator', Users=obj, is_Role=False)
             Role.objects.create(name='Moderator', Users=obj, is_Role=False)
             return redirects
+        print(username)
+        text = User.objects.all()
+        for i in text:
+            print(i.username)
         obj = User.objects.filter(username=username).first()
         if obj is None:
+            print('EBOBANA')
             return {'error': True}
         if obj.check_password(raw_password=password) is not True:
+            print('PASSWORD NOT ALLOWED')
             return {'error': True}
         data_uuid = uuid.uuid4().hex
         redirects = redirect('/')
         if cookie_saves.objects.filter(cookie_user_id=obj.id).first() is None:
+            cookie_saves.objects.filter(cookie_user_id=obj.id).delete()
             cookie_saves.objects.create(cookie_user_id=obj.id, cookie_user_token=data_uuid)
-            redirects.set_cookie(key='loggined_token', value=data_uuid, max_age=100000)
+            redirects.delete_cookie(key='loggined_token')
+            redirects.set_cookie(key='loggined_token', value=data_uuid, max_age=10000000)
         return redirects
 

@@ -9,13 +9,13 @@ from .models import cookie_saves, Role
 
 def del_user(request):
     form, text = DelUserForm()
-    if request.is_moderator:
+    if request.Is_Anypermissions:
         return render(request, 'blog/post/deluser.html', {'error': True})
     if request.method == 'POST':
         form = DelUserForm(request.POST)
         if form.is_valid():
-            cd = form.cleaned_data
-            user = User.objects.filter(username=cd['name']).first()
+            form_data = form.cleaned_data
+            user = User.objects.filter(username=form_data['name']).first()
             if user is not None:
                 user.delete()
     return render(request, 'blog/post/deluser.html', {'form': form, 'who': 'user'})
@@ -28,11 +28,12 @@ def del_moderator(request):
     if request.method == 'POST':
         form = ModerDeleteForm(request.POST)
         if form.is_valid():
-            cd = form.cleaned_data
-            find = Moderator.objects.filter(name=cd['name']).first()
-            if find is not None:
-                find.delete()
-                # not_Moderator.objects.create(name=cd['name'])
+            form_data = form.cleaned_data
+            User_Model = User.objects.filter(username=form_data['name'])
+            Role_selected = Role.objects.filter(name='Administrator', Users=User_Model)
+            if Role_selected.is_Role:
+                Role_selected.is_Role = False
+                Role_selected.save()
     return render(request, 'blog/post/deluser.html', {'form': form, 'who': 'moderator'})
 
 
@@ -43,8 +44,9 @@ def del_administrator(request):
     if request.method == 'POST':
         form = AdminDeleteForm(request.POST)
         if form.is_valid():
-            cd = form.cleaned_data
-            find = Admin.objects.filter(name=cd['name']).first()
+            form_data = form.cleaned_data
+            user_account = User.objects.filter(username=form_data['name'])
+            find = Role.objects.filter(User=user_account, ).first()
             if find is not None:
                 find.delete()
     return render(request, 'blog/post/deluser.html', {'form': form, 'who': 'administrator'})
@@ -57,17 +59,17 @@ def auth(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid():
-            cd = form.cleaned_data
-            Login_return = BackendAuth().authenticate(request=request, username=cd['login'], password=cd['password'])
+            form_data = form.cleaned_data
+            Login_return = BackendAuth().authenticate(request=request, username=form_data['login'], password=form_data['password'])
             if not Login_return.get('error'):
                 return Login_return
-            trouble = True
+        trouble = True
     return render(request, 'blog/post/share.html', {'form': form, 'trouble': trouble})
 
 
 def profile(request):
     administrator = request.is_administrator
-    moderator = request.is_moderator
+    moderator = request.Is_Anypermissions
     return render(request, 'blog/get/profile.html', {'ToFAdm': administrator, 'ToFModer': moderator, 'error': False})
 
 
