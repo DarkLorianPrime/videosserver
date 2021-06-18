@@ -14,7 +14,7 @@
     </style>
 </head>
 <body>
-{% if error != True %}
+{% if error != True or request.Is_Anypermissions != False %}
 <div id="content">
     {% block content %}
     {% endblock %}

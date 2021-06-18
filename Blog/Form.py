@@ -27,5 +27,5 @@ class NewNameForm(forms.Form):
 
 
 class RatingForm(forms.Form):
-    CHOICES = [('1', '1'), ('2', '2'), ('3', '3'), ('4', '4'), ('5', '5')]
+    CHOICES = [[j + 1 for i in range(0, 2)] for j in range(0, 5)]
     like = forms.ChoiceField(choices=CHOICES, widget=forms.RadioSelect, )

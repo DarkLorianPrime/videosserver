@@ -34,10 +34,3 @@ class BackendAuth(BaseBackend):
             redirects.set_cookie(key='loggined_token', value=data_uuid, max_age=100000)
         return redirects
 
-    def get_user(self, token=None):
-        user = cookie_saves.objects.filter(cookie_user_token=token).first()
-        if user is not None:
-            user_returned_id = user.cookie_user_id
-        else:
-            user_returned_id = None
-        return User.objects.filter(id=user_returned_id).first()

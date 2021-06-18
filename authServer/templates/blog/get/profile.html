@@ -4,7 +4,9 @@
 {% block content %}
 <body>
 <div class="center_reg">
-    <p>Hello, {{ user.username }}!</p>
+    {% if request.Auth_user != None %}
+    <p>Hello, {{ request.Auth_user.username }}!</p>
+    {% endif %}
     <div class="center_prof">
         <div>
             {% if ToFAdm == True %}

@@ -35,8 +35,8 @@ class Styles(models.Model):
 
 class Post(models.Model):
     title = models.CharField(max_length=50)
-    producer = models.JSONField()
-    actors = models.JSONField()
+    producer = models.ManyToManyField(Prod)
+    actors = models.ManyToManyField(Actors)
     slug = models.SlugField(max_length=250, unique_for_date='publish')
     description = models.TextField()
     publish = models.DateTimeField(default=timezone.now)
