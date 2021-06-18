@@ -116,12 +116,10 @@ def new_film(request):
                                                    style=returned['style'])
             for one_in_actors in returned['actors']:
                 selected_actor = Actors.objects.filter(name=one_in_actors).first()
-                Post_to_personal.actors.create(name=selected_actor)
-                selected_actor.delete()
+                Post_to_personal.actors.add(name=selected_actor)
             for one_in_prods in returned['prod']:
                 selected_producer = Prod.objects.filter(name=one_in_prods).first()
-                Post_to_personal.producer.create(name=selected_producer)
-                selected_producer.delete()
+                Post_to_personal.producer.add(name=selected_producer)
             return redirect('/')
 
 
