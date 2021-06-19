@@ -6,7 +6,7 @@
 <div class="all_posts">
     <h1>All films:</h1>
     {% for post in posts %}
-    <div class="one_in_list" onclick="location.href='{{ post.slug }}'">
+    <div class="one_in_list" onclick="location.href='/{{ post.slug }}'">
         <h2>
             <a href="{{ post.slug }}">
                 {{ post.title }}
