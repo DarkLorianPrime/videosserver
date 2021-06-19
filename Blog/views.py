@@ -1,4 +1,5 @@
 import requests
+from django.db.models import QuerySet
 from django.shortcuts import render, get_object_or_404, redirect
 from django.template import RequestContext
 
@@ -67,9 +68,7 @@ def new_style(request):
 
 
 def filters(request):
-    form, actor, prod, admin, er_l, list_find = FiltersForm(), False, False, False, False, []
-    if not request.Is_Anypermissions:
-        admin = True
+    form, actor, prod, er_l, list_find = FiltersForm(), False, False, False, []
     if request.method == 'POST':
         form = FiltersForm(request.POST)
         if form.is_valid():
@@ -80,35 +79,28 @@ def filters(request):
                     return redirect(f'/{returned.slug}')
                 else:
                     er_l = True
-            all_posts = Post.objects.all()
-            for i in all_posts:
-                if i.actors.filter(name=form_data['actor']).first() is not None:
-                    list_find.append(i)
-            for i in all_posts:
-                if i.producer.filter(name=form_data['producer']).first() is not None:
-                    list_find.append(i)
-            if list_find:
-                return render(request, 'blog/post/list.html', {'posts': list_find})
+                return render(request, 'blog/post/filters.html',
+                              {'form': form, 'admin': request.Is_Anypermissions, 'error_local': er_l})
+            list_find = Post.objects.all().filter(producer=form_data['producer'], actors=form_data['actor'])
+            return render(request, 'blog/post/list.html', {'posts': list_find, 'admin': request.Is_Anypermissions})
     return render(request, 'blog/post/filters.html',
-                  {'form': form, 'admin': admin, 'error_local': er_l})
+                  {'form': form, 'admin': request.Is_Anypermissions, 'error_local': er_l})
 
 
 def new_film(request):
     dictes_for_Actors, dictes_for_prods, int_for_actors, int_for_prods, form, admin = {}, {}, 0, 0, FilmForm(), False
     if not request.Is_Anypermissions:
         return render(request, 'blog/post/new_film.html', {'error': True})
-    if request.method != 'POST':
-        return render(request, 'blog/post/new_film.html', {'form': form, 'admin': True})
     if request.method == 'POST':
         form = FilmForm(request.POST)
         if form.is_valid():
             returned = form.cleaned_data
             if Post.objects.filter(slug=returned['slug']):
                 return render(request, 'blog/post/new_film.html', {'form': form, 'loggined': True})
-            photo = returned['art_link']
+            photo = 'https://i2.wp.com/dimlix.com/wp-content/uploads/2020/07/150-scaled.jpg'
             if returned['art_link'] == '':
-                photo = requests.get(f'https://imdb-api.com/API/SearchTitle/k_hfcfkmgb/{returned["Title"]}').json()[
-                    'results']
+                link = f'https://imdb-api.com/API/SearchTitle/k_hfcfkmgb/{returned["Title"]}'
+                photo = requests.get(link).json()['results']
                 if photo:
                     photo = photo[0]['image']
             Post_to_personal = Post.objects.create(title=returned['Title'], slug=returned['slug'], art_link=photo,
@@ -116,19 +108,17 @@ def new_film(request):
                                                    style=returned['style'])
             for one_in_actors in returned['actors']:
                 selected_actors = Actors.objects.filter(name=one_in_actors).first()
-                Post_to_personal.actors.add(name=selected_actors)
+                Post_to_personal.actors.add(selected_actors)
             for one_in_prods in returned['prod']:
                 selected_producer = Prod.objects.filter(name=one_in_prods).first()
-                Post_to_personal.producer.add(name=selected_producer)
+                Post_to_personal.producer.add(selected_producer)
             return redirect('/')
+    return render(request, 'blog/post/new_film.html', {'form': form, 'admin': True})
 
 
 def post_list(request):
     post_listin = Post.objects.all()
-    admin = False
-    if request.Is_Anypermissions:
-        admin = True
-    return render(request, 'blog/post/list.html', {'posts': post_listin, 'admin': admin})
+    return render(request, 'blog/post/list.html', {'posts': post_listin, 'admin': request.Is_Anypermissions})
 
 
 def post_one_delete(request, post):
@@ -141,9 +131,6 @@ def post_one(request, post):
     integ, integ_sum, dict_for_sum = 0, 0, {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0}
     form = RatingForm()
     poster, user = get_object_or_404(Post, slug=post), request.Auth_user
-    admin = False
-    if request.Is_Anypermissions:
-        admin = True
     rating_user = Rating.objects.filter(name=post, username=user).first()
     if rating_user is None:
         if request.method == 'POST':
@@ -168,5 +155,5 @@ def post_one(request, post):
     actors = ', '.join(one_in_actors_list)
     producers = ', '.join(one_in_prods_list)
     return render(request, 'blog/post/detail.html',
-                  {'post': poster, 'actors': actors, 'prods': producers, 'admin': admin,
+                  {'post': poster, 'actors': actors, 'prods': producers, 'admin': request.Is_Anypermissions,
                    'form': form, 'RatingAll': dict_for_sum})
