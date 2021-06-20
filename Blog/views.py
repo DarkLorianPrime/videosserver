@@ -1,10 +1,12 @@
 import requests
+import transliterate
 from django.db.models import QuerySet
 from django.shortcuts import render, get_object_or_404, redirect
 from django.template import RequestContext
 
 from Blog.Form import FilmForm, NewNameForm, NewStyleForm, RatingForm, FiltersForm
 from Blog.models import Post, Rating, Actors, Prod, Styles
+from extras.replacer import replacer
 
 
 def new_producers(request):
@@ -95,15 +97,17 @@ def new_film(request):
         form = FilmForm(request.POST)
         if form.is_valid():
             returned = form.cleaned_data
-            if Post.objects.filter(slug=returned['slug']):
-                return render(request, 'blog/post/new_film.html', {'form': form, 'loggined': True})
             photo = 'https://i2.wp.com/dimlix.com/wp-content/uploads/2020/07/150-scaled.jpg'
             if returned['art_link'] == '':
                 link = f'https://imdb-api.com/API/SearchTitle/k_hfcfkmgb/{returned["Title"]}'
                 photo = requests.get(link).json()['results']
                 if photo:
                     photo = photo[0]['image']
-            Post_to_personal = Post.objects.create(title=returned['Title'], slug=returned['slug'], art_link=photo,
+            text_for_slug = transliterate.translit(returned['Title'], 'ru', reversed=True)
+            text_slug = replacer(text_for_slug)
+            if Post.objects.filter(slug=text_slug):
+                return render(request, 'blog/post/new_film.html', {'form': form, 'loggined': True})
+            Post_to_personal = Post.objects.create(title=returned['Title'], slug=text_slug, art_link=photo,
                                                    description=returned['description'], author='darklorian',
                                                    style=returned['style'])
             for one_in_actors in returned['actors']:
