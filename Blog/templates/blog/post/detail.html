@@ -25,15 +25,17 @@
         <br>
     </div>
     {% if admin == True %}
-    <a class="menu_button button" href="delete">Delete this page</a>
+    <p><a class="menu_button button" href="delete">Delete this page</a></p>
     {% endif %}
-    <p><img class="img_rate" src="{% static 'photos/star-fill.png' %}">All:{{RatingAll.all}}</p>
-    <p><img class="img_rate" src="{% static 'photos/star-fill.png' %}">1: {{RatingAll.1}}</p>
-    <p><img class="img_rate" src="{% static 'photos/star-fill.png' %}">2: {{RatingAll.2}}</p>
-    <p><img class="img_rate" src="{% static 'photos/star-fill.png' %}">3: {{RatingAll.3}}</p>
-    <p><img class="img_rate" src="{% static 'photos/star-fill.png' %}">4: {{RatingAll.4}}</p>
-    <p><img class="img_rate" src="{% static 'photos/star-fill.png' %}">5: {{RatingAll.5}}</p>
+    <img class="img_rate" src="{% static 'photos/star-fill.png' %}">All:{{RatingAll.all}}
+    <img class="img_rate" src="{% static 'photos/star-fill.png' %}">1: {{RatingAll.1}}
+    <img class="img_rate" src="{% static 'photos/star-fill.png' %}">2: {{RatingAll.2}}
+    <img class="img_rate" src="{% static 'photos/star-fill.png' %}">3: {{RatingAll.3}}
+    <img class="img_rate" src="{% static 'photos/star-fill.png' %}">4: {{RatingAll.4}}
+    <img class="img_rate" src="{% static 'photos/star-fill.png' %}">5: {{RatingAll.5}}
     {% if form != True %}
+    {% if request.Auth_user != None %}
+    <hr>
     <form method="post">
         {{ form.like.0 }}
         <label aria-hidden="true" for="id_like_0"><img class="img_rate"
@@ -53,6 +55,7 @@
         <input class="input_button" type="submit" value="Rate!">
         {% csrf_token %}
     </form>
+    {% endif %}
     {% endif %}
 </div>
 {% endblock %}

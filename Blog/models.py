@@ -17,6 +17,11 @@ class Actors(models.Model):
         return self.name
 
 
+class Entire_rating(models.Model):
+    name = models.CharField(max_length=100)
+    entire_stars = models.IntegerField()
+
+
 class Rating(models.Model):
     name = models.CharField(max_length=100)
     stars = models.IntegerField()

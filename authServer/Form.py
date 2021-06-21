@@ -29,6 +29,6 @@ class new_moderForm(forms.Form):
 
 
 class RegistrationForm(forms.Form):
-    login = forms.CharField(max_length=100, label='',)
+    login = forms.CharField(max_length=24, label='',)
     password = forms.CharField(max_length=100, label='', widget=forms.PasswordInput, min_length=5)
     email = forms.EmailField(max_length=100, label='', widget=forms.EmailInput)

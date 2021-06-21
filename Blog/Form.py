@@ -12,7 +12,6 @@ class FilmForm(forms.Form):
     Title = forms.CharField(max_length=100, label='', )
     actors = forms.ModelMultipleChoiceField(queryset=Actors.objects.all())
     prod = forms.ModelMultipleChoiceField(queryset=Prod.objects.all())
-    slug = forms.SlugField(max_length=250)
     description = forms.CharField(widget=forms.Textarea)
     art_link = forms.CharField(max_length=1000, label='null', required=False)
     style = forms.ModelChoiceField(queryset=Styles.objects.all())
