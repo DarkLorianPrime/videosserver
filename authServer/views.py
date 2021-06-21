@@ -62,6 +62,7 @@ def auth(request):
             form_data = form.cleaned_data
             Login_return = BackendAuth().authenticate(request=request, username=form_data['login'], password=form_data['password'])
             if not Login_return.get('error'):
+                print(Login_return)
                 return Login_return
         trouble = True
     return render(request, 'blog/post/share.html', {'form': form, 'trouble': trouble})

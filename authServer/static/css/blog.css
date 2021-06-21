@@ -4,31 +4,79 @@
 
 a {
     text-decoration: none;
-    color: Black;
+    color: White;
 
 }
 .text_desc {
     color: black;
 }
+::selection {
+    background: #957DAD;
+    color: white;
+}
+.dot {
+    cursor: pointer;
+    height: 15px;
+    width: 15px;
+    margin: 0 2px;
+    background-color: #bbb;
+    border-radius: 50%;
+    display: inline-block;
+    transition: background-color 0.6s ease;
+}
+.slider {
+  position: relative;
+  overflow: hidden;
+  width: 400px;
+  height: 200px;
+  margin-bottom: 10px;
+}
+
 .one_in_list {
-    border-bottom: 1px solid lightgrey;
-    border-right: 1px solid lightgrey;
-    border-left: 2px solid WhiteSmoke;
-    border-top: 2px solid WhiteSmoke;
-    margin-top: 10px;
-    margin-left: 10px;
-    box-shadow: 5px 5px 5px black;
-    padding-bottom: 10px;
-    background-color: white;
+    color: white;
+    box-shadow: 5px 5px 5px #100e25;
+    border-radius: 20px 20px 0 20px;
+    background-image: linear-gradient(to left, #312b45,#1f1b2e);
+    margin: 30px;
+    padding: 30px;
+    height: 750px;
     word-wrap: break-word;
+    width: 45%;
+    float: left;
+}
+
+.one_in_list:hover {
+    background-image: linear-gradient(to left, #312b45, #1f1b4e);
+    box-shadow: 5px 5px 5px black;
+    margin: 30px;
+    padding: 30px;
+    cursor: pointer;
+}
+
+.right_button {
+    display: inline-block;
+    float: right;
 }
 .menu_button {
    font-size: 25px;
+   margin-left: 20px;
+   transition: all 300ms cubic-bezier(0.250, 0.250, 0.750, 0.750);
+   color: white;
 }
+
+.img_logo {
+    width: 50px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
 .menu_button:hover {
     color: Grey;
     border-bottom: 1px solid red;
+    transition: all 300ms cubic-bezier(0.250, 0.250, 0.750, 0.750);
+    letter-spacing: 2px;
 }
+
 .block {
     height: 10%;
     padding: 15px 55px 15px 5px;
@@ -38,60 +86,80 @@ a {
     margin-bottom: 20px;
     margin-right: 15px;
     border-radius: 10%;
-}
+    color: white;
+    }
+
 .green {
     color: green;
     font-weight: bold;
     border-color: green;
 }
+
 .red {
     color: red;
     font-weight: bold;
     border-color: red;
 }
+
 .border-button {
     border: 1px solid white;
     box-shadow: 5px 5px 5px black;
     font-weight: bold;
     cursor: pointer;
-
+    color: white;
 }
+
 .border-button:hover {
     box-shadow: 5px 3px 3px black;
 }
+
 .border-button:active {
     box-shadow: 5px 1px 1px black;
 }
+
 .border-block-a {
     text-align: center;
     cursor: pointer:
+    color: white;
 }
-.one_in_list:hover {
-    background-color: lightgrey;
-    border-bottom: 1px solid lightgrey;
-    border-right: 1px solid lightgrey;
-    box-shadow: 5px 5px 5px black;
-    border-left: 2px solid WhiteSmoke;
-    border-top: 2px solid WhiteSmoke;
-    margin-top: 10px;
-    margin-left: 10px;
-    padding-bottom: 10px;
-    cursor: pointer;
+
+.inline_menu {
+    display: inline-block;
+    background: linear-gradient(-45deg, transparent 60px, #957DAD 0%, #100e19 20%);
+    padding-right: 150px;
+    margin: 0;
+    line-height: 70px;
 }
+
 .user_nick {
     padding: 0 10px 0 10px;
     font-size: 24px;
     border-left: 1px solid red;
     border-right: 1px solid red;
     border-radius: 10%;
+    text-align: center;
+    line-height: 50px;
+    color: white;
+    vertical-align: middle;
 }
 .input_button {
-    border: 2px solid red;
-    border-radius: 35% 15% 35% 15%;
+    border: 0;
+    border-radius: 3px;
+    font-weight: 700;
+    box-shadow: 5px 5px 10px;
     cursor: pointer;
     font-size: 24px;
     margin-bottom: 10px;
-
+    width: 100%;
+    background-color: rgba(255,255,255,0.5);
+    transition: all 400ms cubic-bezier(0.250, 0.250, 0.750, 0.750);
+    letter-spacing: 0px;
+}
+.input_button:hover {
+    box-shadow: 5px 5px 5px;
+    background-color: rgba(255,255,255,0.1);
+    transition: all 300ms cubic-bezier(0.250, 0.250, 0.750, 0.750);
+    letter-spacing: 4px;
 }
 .Back {
     margin-left: 15px;
@@ -103,15 +171,18 @@ margin-left: 10px;
 .border {
 border-bottom: 1px solid black;
 }
+
 .otstyp {
 margin-bottom: 10px;
 margin-left: 20px;
 }
+
 .center {
     display: flex;
     flex-direction: column;
     text-align: center;
     font-size: 24px;
+    border-radius: 10px;
 }
 .center_error {
    margin-left: 25%;
@@ -147,6 +218,9 @@ option, option:focus {
     height: 40px;
 
 }
+.post_title {
+    color: white;
+}
 #id_description {
     min-width: 500px;
     max-width: 500px;
@@ -173,60 +247,62 @@ border-bottom: 3px solid red;
 width: 50px;
 font-size: 24px;
 }
-input:focus,
-select:focus,
-textarea:focus,
-button:focus {
+
+input:focus, select:focus, textarea:focus, button:focus {
     background-color: transparent;
     outline: none;
 }
+
 .bg {
-background-color: rgba(255,255,255,0.7);
-display: block;
+    background-color: rgba(255,255,255,0.7);
+    display: block;
 }
 .l_box1 {
-overflow: hidden;
-background-color: red;
-font-size: 1px;
-width: 100px;
+    overflow: hidden;
+    background-color: red;
+    font-size: 1px;
+    width: 100px;
 }
 [id^=id_like_] {
-display: none
+    display: none
 }
 [id^=id_like_] + label {
-  display: inline-block;
-  vertical-align: middle;
-  font-size: 50px;
-  color: #555;
-  cursor: pointer;
+    display: inline-block;
+    vertical-align: middle;
+    font-size: 50px;
+    color: #555;
+    cursor: pointer;
 }
 #id_like_0:checked + label {
     background-color: tomato;
 }
 #id_actor, #id_producer, #id_names {
-border: 0;
-background-color: rgba(255,255,255,0.1);
-border-bottom: 3px solid red;
-height: 40px;
-width: 350px;
-font-size: 24px;
+    border: 0;
+    background-color: rgba(255,255,255,0.1);
+    border-bottom: 3px solid red;
+    height: 40px;
+    width: 350px;
+    font-size: 24px;
 
 }
 [id^=id_like_]:checked + label {
-  background-color: tomato;
-  cursor: text;
-  width: 10px;
+    background-color: tomato;
+    cursor: text;
+    width: 10px;
 }
 .img_rate {
-width: 50px;
+    width: 50px;
 }
 .center_reg {
-    margin-left: 50%;
-    margin-top: 20%;
-    background-color: rgba(255, 255, 255, 0.7);
+    color: white;
+    background-image: linear-gradient(to left, #312b45,#1f1b2e);;
+    margin-left: 30%;
+    margin-top: 10%;
+    width: 50%;
     display: flex;
     flex-direction: column;
     text-align: center;
+    align-items: center;
     border-radius: 5%;
 }
 .border_form {
@@ -258,7 +334,7 @@ html {
     word-wrap: break-word;
 }
 .ex {
-margin-top: 50px;
+    margin-top: 50px;
 }
 h1 {
     border-bottom: 1px solid grey;
@@ -268,56 +344,76 @@ h1 {
 .info {
     color: grey;
 }
-#content,
-#sidebar {
-  float: left;
-  padding: 20px;
-  height: 100%;
+#content {
+    float: left;
+    height: 100%;
+}
+#first_sidebar {
+    display: inline-block;
+    float: left;
+}
+#second_sidebar, .right_button {
+    display: inline-block;
+    padding: 20px;
+    height: 100%;
+}
+.text_films {
+    margin-left: 10px;
 }
 .all_posts {
+    color: white;
     padding-right: 10px;
     padding-top: 5px;
-    background-color: rgba(255, 255, 255, 0.7);
+    background-color: #100e25;
     overflow: auto;
-    height: 960px;
+    display: inline;
+    # box-shadow: 3px 3px 20px #312b45;
 }
 
 ::-webkit-scrollbar-track {
-background-color: rgba(255,255,255,0.7);
-box-shadow:0px 0px 3px #000 inset;
-border-radius: 20px;
+    background-color: rgba(255,255,255,0);
+    box-shadow:0px 0px 3px #000 inset;
+    border: 0;
+    border-radius: 20px;
 }
 
 ::-webkit-scrollbar-thumb {
-border-radius: 20px;
-background-color: black;
+    border-radius: 20px;
+    background: linear-gradient(180deg, #bdc3c7, #2c3e50);
 }
 
 ::-webkit-scrollbar{
-width: 11px;
+    width: 11px;
 }
 
 .footer{
-display: inline-block;
-font-size: 24px;
-background-color: rgba(255,255,255,0.7);
+    display: inline-block;
+    font-size: 24px;
+    background: #957DAD;
+    border: 5px solid #957DAD;
+    border-top: 0;
+    color: white;
+    float: right;
 }
 
 #content {
-    width: 70%;
+    width: 89%;
+}
+.description_left {
+    color: white;
+    width: 50px;
+    height: 0;
 }
 .button {
-border: 0;
-background-color: rgba(255,255,255,0);
-text-align: center;
-cursor: pointer;
-outline: none;
+    border: 0;
+    background-color: rgba(255,255,255,0);
+    text-align: center;
+    cursor: pointer;
+    outline: none;
 }
 #sidebar {
-  width: 30%;
-  height: auto;
-  background-color: rgba(255,255,255,0.7);
-  border-bottom: 5px solid black;
-  border-left: 2px solid black;
-  border-radius: 0 0 0 30% / 20%;
+    width: 100%;
+    height: auto;
+    background-color: #100e20;
+    border-bottom: 5px solid #957DAD;
 }
