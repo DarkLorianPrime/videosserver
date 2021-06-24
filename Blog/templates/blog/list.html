@@ -1,0 +1,38 @@
+{% extends "blog/base_to_blog.html" %}
+{% load static %}
+{% block title %}All films{% endblock %}
+
+{% block content %}
+    <script src="https://yastatic.net/jquery/3.3.1/jquery.min.js"></script>
+    <meta property="og:title" content="DarkLorian Film Library">
+    <meta property="og:site_name" content="DLFL">
+    <meta property="og:url" content="video.darklorian.space">
+    <meta property="og:description" content="video.darklorian.space">
+    <meta property="og:image" content="{% static best.url %}">
+    <p class="center rgb_cee">Our top</p>
+    {% for best in the_best %}
+        <div class="circle_top" style="background-image: url({{ best.img }});" onclick="location.href='/{{ best.slug }}'">
+            <a class="top_l">{{ best.name }}</a>
+            <p class="top_l">{{ best.star }}</p>
+        </div>
+    {% endfor %}
+    <script>
+        console.log('LorCO');
+    </script>
+    <div class="all_posts">
+        <h1 class="text_films">All films:</h1>
+        {% for post in posts %}
+            <div class="one_in_list" onclick="location.href='/{{ post.slug }}'">
+                <h2>
+                    <a class="post_title" href="{{ post.slug }}">
+                        {{ post.title }}
+                    </a>
+                    <p class="date">Style: {{ post.style }} </p>
+                </h2>
+                <img class="art" src="{% static 'photos/films/' %}{{post.slug}}.png">
+                <a class="description_left">{{ post.description|truncatewords:50|linebreaks }}</a>
+                <p class="date">Published: {{ post.publish }}</p>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

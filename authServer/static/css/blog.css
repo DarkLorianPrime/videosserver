@@ -1,5 +1,7 @@
+@import url("fonts.css");
+
 * {
-    box-sizing:border-box;
+    box-sizing: border-box;
 }
 
 a {
@@ -7,13 +9,16 @@ a {
     color: White;
 
 }
+
 .text_desc {
     color: black;
 }
+
 ::selection {
     background: #957DAD;
     color: white;
 }
+
 .dot {
     cursor: pointer;
     height: 15px;
@@ -24,24 +29,25 @@ a {
     display: inline-block;
     transition: background-color 0.6s ease;
 }
+
 .slider {
-  position: relative;
-  overflow: hidden;
-  width: 400px;
-  height: 200px;
-  margin-bottom: 10px;
+    position: relative;
+    overflow: hidden;
+    width: 400px;
+    height: 200px;
+    margin-bottom: 10px;
 }
 
 .one_in_list {
     color: white;
     box-shadow: 5px 5px 5px #100e25;
     border-radius: 20px 20px 0 20px;
-    background-image: linear-gradient(to left, #312b45,#1f1b2e);
+    background-image: linear-gradient(to left, #312b45, #1f1b2e);
     margin: 30px;
     padding: 30px;
-    height: 750px;
     word-wrap: break-word;
     width: 45%;
+    height: 800px;
     float: left;
 }
 
@@ -57,11 +63,13 @@ a {
     display: inline-block;
     float: right;
 }
+
 .menu_button {
-   font-size: 25px;
-   margin-left: 20px;
-   transition: all 300ms cubic-bezier(0.250, 0.250, 0.750, 0.750);
-   color: white;
+    font-family: 'Aqum', serif;
+    font-size: 150%;
+    margin-left: 20px;
+    transition: all 100ms;
+    color: white;
 }
 
 .img_logo {
@@ -73,7 +81,7 @@ a {
 .menu_button:hover {
     color: Grey;
     border-bottom: 1px solid red;
-    transition: all 300ms cubic-bezier(0.250, 0.250, 0.750, 0.750);
+    transition: all 100ms;
     letter-spacing: 2px;
 }
 
@@ -87,7 +95,7 @@ a {
     margin-right: 15px;
     border-radius: 10%;
     color: white;
-    }
+}
 
 .green {
     color: green;
@@ -119,7 +127,7 @@ a {
 
 .border-block-a {
     text-align: center;
-    cursor: pointer:
+    cursor: pointer;
     color: white;
 }
 
@@ -142,6 +150,7 @@ a {
     color: white;
     vertical-align: middle;
 }
+
 .input_button {
     border: 0;
     border-radius: 3px;
@@ -151,49 +160,55 @@ a {
     font-size: 24px;
     margin-bottom: 10px;
     width: 100%;
-    background-color: rgba(255,255,255,0.5);
-    transition: all 400ms cubic-bezier(0.250, 0.250, 0.750, 0.750);
-    letter-spacing: 0px;
+    background-color: rgba(255, 255, 255, 0.5);
+    transition: all 100ms;
+    letter-spacing: 0;
 }
+
 .input_button:hover {
     box-shadow: 5px 5px 5px;
-    background-color: rgba(255,255,255,0.1);
-    transition: all 300ms cubic-bezier(0.250, 0.250, 0.750, 0.750);
+    background-color: rgba(255, 255, 255, 0.1);
+    transition: all 100ms;
     letter-spacing: 4px;
 }
+
 .Back {
     margin-left: 15px;
 }
+
 .text_prod {
-margin-left: 10px;
+    margin-left: 10px;
 
 }
+
 .border {
-border-bottom: 1px solid black;
+    border-bottom: 1px solid black;
 }
 
 .otstyp {
-margin-bottom: 10px;
-margin-left: 20px;
+    margin-bottom: 10px;
+    margin-left: 20px;
 }
 
-.center {
+.center, .circle_top {
     display: flex;
     flex-direction: column;
     text-align: center;
     font-size: 24px;
     border-radius: 10px;
 }
+
 .center_error {
-   margin-left: 25%;
-   width: 50%;
-   display: flex;
-   flex-direction: column;
-   text-align: center;
-   background-color: rgba(255,255,255,0.7);
-   border-radius: 45%;
-   border: 2px solid red;
+    margin-left: 25%;
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 45%;
+    border: 2px solid red;
 }
+
 #id_actors, #id_prod, #id_actors:focus, #id_prod:focus {
     width: 400px;
     height: 75px;
@@ -201,51 +216,75 @@ margin-left: 20px;
     margin-left: 10px;
     background-color: rgba(255, 255, 255, 0.1);
     color: black;
-    border-left: 3px solid rgba(255,0,0,0.7);
+    border-left: 3px solid rgba(255, 0, 0, 0.7);
     margin-bottom: 10px;
     font-size: 16px;
 }
+
 option, option:focus {
     color: black;
-    background-color: rgba(255,255,255,0.1);
+    background-color: rgba(255, 255, 255, 0.1);
 }
+
 #id_password, #id_login, #id_email, #id_Title {
     color: black;
     border: none;
     background-color: white;
     border-bottom: 5px solid black;
-    width:  calc(100px + 5hmin);
+    width: 80%;
     height: 40px;
 
 }
+
 .post_title {
     color: white;
 }
+.img_ava {
+    width: 40%;
+}
+#drop-area {
+    border: 2px dashed #ccc;
+    border-radius: 20px;
+    width: 480px;
+    font-family: sans-serif;
+    margin: 100px auto;
+    padding: 20px;
+}
+.text_sc {
+    color: white;
+}
 #id_description {
+    color: white;
+    font-size: 24px;
     min-width: 500px;
-    max-width: 500px;
+    max-width: 1000px;
     min-height: 100px;
-    max-height: 100px;
+    max-height: 500px;
+    height: 200px;
+    width: 500px;
     overflow: hidden;
     border: 1px solid red;
-    background-color: rgba(255,255,255,0.1);
+    background-color: rgba(255, 255, 255, 0.1);
 }
-#id_Title, #id_style, #id_art_link, #id_Name, #id_slug, #id_nick, #id_name  {
-    background-color: rgba(255,255,255,0.1);
+
+#id_Title, #id_style, #id_art_link, #id_Name, #id_slug, #id_nick, #id_name, input[name=kinput_name_2], input[name=kinput_name] {
+    background-color: rgba(255, 255, 255, 0.1);
     border: 0;
     border-left: 1px solid red;
     margin-bottom: 10px;
     font-size: 20px;
 }
-#id_style{
+
+#id_style {
     width: 150px;
 }
+
 #id_Raiting {
-border: 0;
-background-color: rgba(255,255,255,0);
-border-bottom: 3px solid red;
-width: 50px;
-font-size: 24px;
+    border: 0;
+    background-color: rgba(255, 255, 255, 0);
+    border-bottom: 3px solid red;
+    width: 50px;
+    font-size: 24px;
 }
 
 input:focus, select:focus, textarea:focus, button:focus {
@@ -254,18 +293,21 @@ input:focus, select:focus, textarea:focus, button:focus {
 }
 
 .bg {
-    background-color: rgba(255,255,255,0.7);
+    background-color: rgba(255, 255, 255, 0.7);
     display: block;
 }
+
 .l_box1 {
     overflow: hidden;
     background-color: red;
     font-size: 1px;
     width: 100px;
 }
+
 [id^=id_like_] {
     display: none
 }
+
 [id^=id_like_] + label {
     display: inline-block;
     vertical-align: middle;
@@ -273,29 +315,34 @@ input:focus, select:focus, textarea:focus, button:focus {
     color: #555;
     cursor: pointer;
 }
+
 #id_like_0:checked + label {
     background-color: tomato;
 }
+
 #id_actor, #id_producer, #id_names {
     border: 0;
-    background-color: rgba(255,255,255,0.1);
+    background-color: rgba(255, 255, 255, 0.1);
     border-bottom: 3px solid red;
     height: 40px;
     width: 350px;
     font-size: 24px;
 
 }
+
 [id^=id_like_]:checked + label {
     background-color: tomato;
     cursor: text;
     width: 10px;
 }
+
 .img_rate {
     width: 50px;
 }
+
 .center_reg {
     color: white;
-    background-image: linear-gradient(to left, #312b45,#1f1b2e);;
+    background-image: linear-gradient(to left, #312b45, #1f1b2e);;
     margin-left: 30%;
     margin-top: 10%;
     width: 50%;
@@ -305,27 +352,30 @@ input:focus, select:focus, textarea:focus, button:focus {
     align-items: center;
     border-radius: 5%;
 }
+
 .border_form {
     border-top: 1px solid black;
 }
+
 body,
 html {
-    height: auto;
-    width: auto;
     margin: 0;
 }
+
 .art {
     max-width: 200px;
 }
+
 .ogr {
     max-width: 200px;
 }
+
 .art_m {
     float: left;
     max-width: 100%;
     margin-right: 20px;
     vertical-align: bottom;
-    overflow:hidden;
+    overflow: hidden;
 }
 
 .main_div_for_detail {
@@ -333,46 +383,93 @@ html {
     padding-left: 10px;
     word-wrap: break-word;
 }
+
 .ex {
     margin-top: 50px;
 }
+
 h1 {
     border-bottom: 1px solid grey;
     padding-bottom: 10px;
 }
+
 .date,
 .info {
     color: grey;
 }
+
 #content {
     float: left;
-    height: 100%;
+    height: 800px;
 }
+
 #first_sidebar {
     display: inline-block;
     float: left;
 }
+
 #second_sidebar, .right_button {
     display: inline-block;
     padding: 20px;
     height: 100%;
 }
+
 .text_films {
     margin-left: 10px;
 }
+
+.top_l {
+    font-family: 'Weimar', serif;
+    color: white;
+    margin: 20% 0 0;
+    padding: 0;
+    font-size: 30px;
+    font-weight: bold;
+    text-shadow: 0 -1px 1px #606060, 0 -1px 1px #606060, 0 1px 1px #606060, 0 1px 1px #606060, -1px 0 1px #606060, 1px 0 1px #606060, -1px 0 1px #606060, 1px 0 1px #606060, -1px -1px 1px #606060, 1px -1px 1px #606060, -1px 1px 1px #606060, 1px 1px 1px #606060, -1px -1px 1px #606060, 1px -1px 1px #606060, -1px 1px 1px #606060, 1px 1px 1px #606060;
+}
+
+@media only screen {
+    .circle_top {
+        width: 100px;
+    }
+
+    .one_in_list {
+        width: 43%;
+        height: 800px;
+        display: inline-block;
+    }
+}
+
+.rgb_cee {
+    color: white;
+    font-size: 30px;
+}
+
+.circle_top {
+    cursor: pointer;
+    position: relative;
+    margin: 1%;
+    display: inline-block;
+    border: 5px solid white;
+    border-radius: 100px;
+    padding-top: 15%;
+    width: 30%;
+    height: 60%;
+    background-size: 100%;
+    background-repeat: no-repeat;
+}
+
 .all_posts {
     color: white;
     padding-right: 10px;
     padding-top: 5px;
-    background-color: #100e25;
     overflow: auto;
     display: inline;
-    # box-shadow: 3px 3px 20px #312b45;
 }
 
 ::-webkit-scrollbar-track {
-    background-color: rgba(255,255,255,0);
-    box-shadow:0px 0px 3px #000 inset;
+    background-color: rgba(255, 255, 255, 0);
+    box-shadow: 0 0 3px #000 inset;
     border: 0;
     border-radius: 20px;
 }
@@ -382,11 +479,11 @@ h1 {
     background: linear-gradient(180deg, #bdc3c7, #2c3e50);
 }
 
-::-webkit-scrollbar{
+::-webkit-scrollbar {
     width: 11px;
 }
 
-.footer{
+.footer {
     display: inline-block;
     font-size: 24px;
     background: #957DAD;
@@ -398,20 +495,30 @@ h1 {
 
 #content {
     width: 89%;
+    height: 100%;
+    border-right: 1px solid grey;
 }
+
 .description_left {
     color: white;
     width: 50px;
     height: 0;
 }
+
+input {
+    color: white;
+}
+
 .button {
     border: 0;
-    background-color: rgba(255,255,255,0);
+    background-color: rgba(255, 255, 255, 0);
     text-align: center;
     cursor: pointer;
     outline: none;
 }
+
 #sidebar {
+    border-top: 2px solid #957DAD;
     width: 100%;
     height: auto;
     background-color: #100e20;
