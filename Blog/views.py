@@ -1,38 +1,80 @@
 import base64
+import os
 import shutil
+import smtplib
 
+import dotenv
 import requests
 import transliterate
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views import View
 
-from Blog.Form import FilmForm, NewStyleForm, RatingForm, FiltersForm
+from Blog.Form import FilmForm, NewStyleForm, RatingForm, FiltersForm, ResetForm, RecentForm
 from Blog.models import Post, Rating, Actors, Prod, Styles, Entire_rating
+from authServer.views import Logout
 from extras import logger_mini
 from extras.replacer import replacer
+
+
+class Reset_Password(View):
+    error = True
+    form = ResetForm
+
+    def get(self, request):
+        if not request.Auth_user:
+            return render(request, 'blog/resetPassword.html', {'error': self.error})
+        return render(request, 'blog/resetPassword.html', {'form': self.form()})
+
+    def post(self, request):
+        form = self.form(request.POST)
+        if form.is_valid():
+            returned = form.cleaned_data
+            user = request.Auth_user
+            if user.check_password(returned['name']):
+                user.set_password(returned['new_name'])
+                user.save()
+                Logout().get(request)
+                return redirect('/login')
+            else:
+                return render(request, 'blog/resetPassword.html', {'error': self.error})
+
+
+class Recent_Password(View):
+    error = True
+    form = RecentForm
+
+    def get(self, request):
+        if request.Auth_user:
+            return render(request, 'blog/resetPassword.html', {'error': self.error})
+        return render(request, 'blog/resetPassword.html', {'form': self.form()})
+
+    def post(self, request):
+        form = self.form(request.POST)
+        if form.is_valid():
+            returned = form.cleaned_data
 
 
 class New_Style(View):
     admin = False
     form = NewStyleForm
     error = True
-    who = 'style'
+    type = 'style'
 
     def get(self, request):
         if not request.Is_Anypermissions:
             return render(request, 'blog/new_prod.html', {'error': self.error})
-        return render(request, 'blog/new_prod.html', {'admin': self.admin, 'form': self.form(), 'who': self.who})
+        return render(request, 'blog/new_prod.html', {'admin': self.admin, 'form': self.form(), 'type': self.type})
 
     def post(self, request):
         form = self.form(request.POST)
         if form.is_valid():
             returned = form.cleaned_data
-            if Styles.objects.filter(style=returned['Name']).first() is not None:
+            if not Styles.objects.filter(style=returned['Name']).exists():
                 return render(request, 'blog/new_prod.html',
-                              {'form': form, 'loggined': True, 'admin': True, 'who': 'style'})
+                              {'form': form, 'loggined': True, 'admin': True, 'type': 'style'})
             Styles.objects.create(style=returned['Name'])
             logger_mini.logger(request.Auth_user, 'ADD STYLE', f'{returned["Name"]}')
-        return render(request, 'blog/new_prod.html', {'admin': self.admin, 'form': form, 'who': self.who})
+        return render(request, 'blog/new_prod.html', {'admin': self.admin, 'form': form, 'type': self.type})
 
 
 class Moder_Panel(View):
@@ -56,24 +98,26 @@ class Admin_Panel(View):
 
 
 class Filter(View):
-    actor, prod, er_l, list_find = False, False, False, []
+    actor, prod, error, list_find = False, False, False, []
 
     def get(self, request):
         return render(request, 'blog/filters.html',
-                      {'form': FiltersForm(), 'admin': request.Is_Anypermissions, 'error_local': self.er_l})
+                      {'form': FiltersForm(), 'admin': request.Is_Anypermissions, 'error_local': self.error})
 
     def post(self, request):
         form = FiltersForm(request.POST)
         if form.is_valid():
             form_data = form.cleaned_data
             if form_data['names'] != '':
-                returned = Post.objects.filter(title__startswith=form_data['names']).first()
-                if returned is not None:
-                    return redirect(f'/{returned.slug}')
-                else:
-                    self.er_l = True
-                return render(request, 'blog/filters.html',
-                              {'form': form, 'admin': request.Is_Anypermissions, 'error_local': self.er_l})
+                information = form_data['names'].split(',')
+                for one_split in information:
+                    returned = Post.objects.filter(title__startswith=form_data['names'])
+                    if returned.exists():
+                        return redirect(f'/{returned.first().slug}')
+                    returned_actors = Post.objects.all().filter(producer=form_data['producer'], actors=form_data['actor'])
+                    self.error = True
+                    return render(request, 'blog/filters.html',
+                                  {'form': form, 'admin': request.Is_Anypermissions, 'error_local': self.error})
             list_find = Post.objects.all().filter(producer=form_data['producer'], actors=form_data['actor'])
             return render(request, 'blog/list.html', {'posts': list_find, 'admin': request.Is_Anypermissions})
 
@@ -104,18 +148,17 @@ class New_Film(View):
                                 f'authServer/static/photos/films/{text_slug}.png')
             else:
                 with open(f'authServer/static/photos/films/{text_slug}.png', 'wb+') as ava:
-                    message = request.POST.get('imgs_back')
-                    ava.write(base64.b64decode(message.split('base64,')[1]))
+                    ava.write(base64.b64decode(request.POST.get('imgs_back').split('base64,')[1]))
             if Post.objects.filter(slug=text_slug):
                 return render(request, 'blog/new_film.html', {'form': form, 'loggined': True})
-            Post_to_personal = Post.objects.create(title=returned['Title'], slug=text_slug,
-                                                   description=returned['description'], author='darklorian',
-                                                   style=returned['style'])
+            Post_to_personal = Post.objects.create(title=returned['Title'], slug=text_slug, style=returned['style'],
+                                                   description=returned['description'], author='darklorian')
+            Entire_rating.objects.create(name=Post_to_personal, entire_stars=0.0)
             for one_in_actors in request.POST.getlist('kinput_name_2'):
                 selected_actors = Actors.objects.create(name=one_in_actors)
                 Post_to_personal.actors.add(selected_actors)
-            for one_in_prods in request.POST.getlist('kinput_name'):
-                selected_producer = Prod.objects.create(name=one_in_prods)
+            for one_in_producers in request.POST.getlist('kinput_name'):
+                selected_producer = Prod.objects.create(name=one_in_producers)
                 Post_to_personal.producer.add(selected_producer)
             logger_mini.logger(request.Auth_user, 'ADD FILM', f'{returned["Title"]}')
             return redirect('/')
@@ -139,13 +182,14 @@ class Post_List(View):
 class Post_Delete(View):
     @staticmethod
     def get(request, post):
-        id_post = Post.objects.filter(slug=post).first()
-        if id_post is not None:
-            id_post.delete()
-        entire = Entire_rating.objects.filter(name=id_post).first()
-        if entire is not None:
-            entire.delete()
-        Rating.objects.filter(name=id_post).delete()
+        id_post = Post.objects.filter(slug=post)
+        os.remove(f'authServer/static/photos/films/{id_post.first().slug}.png')
+        if id_post.exists():
+            id_post.first().delete()
+        entire = Entire_rating.objects.filter(name=id_post.first())
+        if entire.exists():
+            entire.first().delete()
+        Rating.objects.filter(name=id_post.first()).delete()
         logger_mini.logger(request.Auth_user, 'REMOVE POST', f'{post}')
         return redirect('/')
 
@@ -154,34 +198,26 @@ class One_Post(View):
     form = RatingForm
 
     def get(self, request, post):
-        integ, integ_sum, dict_for_sum, form = 0, 0, {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0, 'all': 0}, True
+        integer_for_all_rating, dict_for_sum, form = 0, {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0, 'all': 0}, True
         poster, user = get_object_or_404(Post, slug=post), request.Auth_user
         rating_all = Rating.objects.filter(name=poster)
-        rating_for_this_post = Entire_rating.objects.filter(name=poster).first()
+        rating_for_this_post = Entire_rating.objects.filter(name=poster)
         one_in_actors_list, one_in_prods_list = [], []
-        for rating in rating_all:
-            dict_for_sum[str(rating.stars)] = dict_for_sum[str(rating.stars)] + 1
-            integ += int(rating.stars)
-            integ_sum += 1
-        if integ_sum != 0:
-            dict_for_sum['all'] = integ / integ_sum
-        for dict_in_actors in poster.actors.values():
-            one_in_actors_list.append(list(dict_in_actors.values())[1])
-        for dict_in_producers in poster.producer.values():
-            one_in_prods_list.append(list(dict_in_producers.values())[1])
-        if rating_for_this_post is None:
-            Entire_rating.objects.create(name=poster, entire_stars=dict_for_sum['all'])
-        else:
-            rating_for_this_post.entire_stars = dict_for_sum['all']
-            rating_for_this_post.save()
-        actors = ', '.join(one_in_actors_list)
-        producers = ', '.join(one_in_prods_list)
-        form = True
-        if Rating.objects.filter(username=user, name=poster).first() is None:
+        if rating_all.count() != 0:
+            for rating in rating_all:
+                dict_for_sum[str(rating.stars)] = dict_for_sum[str(rating.stars)] + 1
+                integer_for_all_rating += int(rating.stars)
+            dict_for_sum['all'] = integer_for_all_rating / rating_all.count()
+        for dict_in_actors in poster.actors.all():
+            one_in_actors_list.append(dict_in_actors.name)
+        for dict_in_producers in poster.producer.all():
+            one_in_prods_list.append(dict_in_producers.name)
+        rating_for_this_post.update(entire_stars=dict_for_sum['all'])
+        if not Rating.objects.filter(username=user, name=poster).exists():
             form = self.form()
         return render(request, 'blog/detail.html',
-                      {'post': poster, 'actors': actors, 'prods': producers, 'admin': request.Is_Anypermissions,
-                       'form': form, 'RatingAll': dict_for_sum})
+                      {'post': poster, 'actors': one_in_actors_list, 'prods': one_in_prods_list,
+                       'admin': request.Is_Anypermissions, 'form': form, 'RatingAll': dict_for_sum})
 
     def post(self, request, post):
         form = self.form(request.POST)

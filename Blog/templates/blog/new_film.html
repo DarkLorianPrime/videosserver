@@ -15,134 +15,17 @@
             <input type="text" id="kinput_2" name="kinput_name_2">
             <p class="text_prod">Producers</p>
             <input type="text" id="kinput" name="kinput_name">
+            <p class="text_prod">Style</p>
+            <a class="border">{{ form.style }}</a>
             <p class="text_prod">Description</p>
             <a class="border text_sc">{{ form.description }}</a>
             <div class="drop-area" id="drop-area" name="drop-area" ondragover="dragoverl(event)"
-                 ondragleave="dragleavel(event)" ondrop="drop(event)" onclick="open_files(event)"><p class="">Add to me
-                your picture!</p>
+                 ondragleave="dragleavel(event)" ondrop="drop(event)" onclick="open_files(event)">
+                <p class="replacer_as">Add to me your picture!</p>
             </div>
-            <p class="text_prod">Style</p>
-            <a class="border">{{ form.style }}</a>
             {% csrf_token %}
             <p><input class="input_button otstyp" type="submit" value="Add new film"></p>
         </form>
     </div>
-    <script>
-        document.getElementsByName('kinput_name')[0].addEventListener("keydown", log);
-        document.getElementsByName('kinput_name_2')[0].addEventListener("keydown", log_2);
-        document.getElementsByClassName('')
-        const list_producers = [];
-        const list_actors = [];
-        let datas;
-        let imgs = document.createElement('img');
-        let form_imgs = document.createElement('input');
-        const droparea = document.getElementsByClassName('drop-area')[0];
-
-        function open_files() {
-            const input = document.createElement('input');
-            input.addEventListener('change', function () {
-                image_update(input.files[0])
-            })
-            input.type = 'file';
-            input.click();
-        }
-
-        function pre_update(data) {
-            image_update(data)
-            return false
-        }
-
-        function drop(event) {
-            event.preventDefault();
-            const data = event.dataTransfer.files[0];
-            image_update(data);
-        }
-
-        function image_update(data_func) {
-            let reader = new FileReader();
-            if (data_func.type === 'image/png' || data_func.type === 'image/jpeg') {
-                reader.readAsDataURL(data_func);
-                reader.onloadend = function () {
-                    imgs.src = String(reader.result);
-                    imgs.className = 'img_ava';
-                    if (datas !== undefined) {
-                        droparea.removeChild(datas);
-                    }
-                    droparea.appendChild(imgs);
-                    form_imgs.value = imgs.src;
-                    form_imgs.name = 'imgs_back';
-                    form_imgs.style.display = 'none';
-                    droparea.appendChild(form_imgs);
-                    datas = imgs;
-                }
-            }
-        }
-
-        function dragleavel(e) {
-            droparea.style.borderColor = "#CCC";
-        }
-
-        function dragoverl(e) {
-            droparea.style.borderColor = "#957DAD";
-        }
-
-        function log_2(e) {
-            if (e.key === ',') {
-                e.preventDefault();
-                handler_off_add('kinput_name_2', log_2, 4)
-            }
-            if (e.key === 'Backspace') {
-                handler_off_backspace('kinput_name_2', e)
-            }
-        }
-
-        function log(e) {
-            if (e.key === ',') {
-                e.preventDefault();
-                handler_off_add('kinput_name', log, 0)
-            }
-            if (e.key === 'Backspace') {
-                handler_off_backspace('kinput_name', e)
-            }
-        }
-
-        function handler_off_backspace(element_name, e) {
-            const text = document.getElementsByName(element_name);
-            if (text[text.length - 1].value === '') {
-                const count = text.length;
-                if (count > 1) {
-                    text[text.length - 1].remove();
-                    text[text.length - 1].removeAttribute('readonly');
-                    text[text.length - 1].style.pointerEvents = 'auto';
-                    text[text.length - 1].focus();
-                    e.preventDefault();
-                    if (element_name === 'kinput_name') {
-                        list_producers.pop();
-                    } else {
-                        list_actors.pop();
-                    }
-                }
-            }
-        }
-
-        function handler_off_add(element_name, element_number, x_minus) {
-            const x = document.getElementById("form");
-            const new_field = document.createElement("input");
-            new_field.type = 'text';
-            new_field.name = element_name;
-            new_field.value = '';
-            const pos = x.childElementCount;
-            x.insertBefore(new_field, x.childNodes[pos - x_minus]);
-            const new_element = document.getElementsByName(element_name);
-            new_element[new_element.length - 1].addEventListener("keydown", element_number)
-            new_element[new_element.length - 1].focus()
-            new_element[new_element.length - 2].setAttribute('readonly', 'readonly')
-            new_element[new_element.length - 2].style.pointerEvents = 'none';
-            if (element_name === 'kinput_name') {
-                list_producers.push({'producer': String(new_element[new_element.length - 2].value)})
-            } else {
-                list_actors.push({'actor': String(new_element[new_element.length - 2].value)})
-            }
-        }
-    </script>
+    <script src="{% static "/js/add_film.js"%}"></script>
 {% endblock %}

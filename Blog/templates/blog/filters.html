@@ -10,15 +10,15 @@
     <p>Not found!</p>
     {% endif %}
     <form method="post">
-        <p class="text_prod">Actors</p>
-        <p class="">{{ form.actor }}</p>
-        <p class="text_prod">Producers</p>
-        <p class="">{{ form.producer }}</p>
-        <p class="text_prod">Name</p>
+        <p class="text_prod">Search:</p>
         <p class="">{{ form.names }}</p>
         {% csrf_token %}
         <p><input class="input_button otstyp" type="submit" value="Add new {{ who }}"></p>
     </form>
 </div>
+    <script>
+    const element = document.getElementById('id_names');
+    element.placeholder = 'Input to me your filters'
+    </script>
 {% endif %}
 {% endblock %}

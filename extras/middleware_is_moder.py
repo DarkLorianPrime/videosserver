@@ -7,7 +7,7 @@ class Is_Moder(MiddlewareMixin):
     def process_request(self, request):
         user = request.Auth_user
         if user is not None:
-            Selected_Role = Role.objects.filter(users=user, name=Role_List.objects.filter(name='Moderator').first()).first()
+            Selected_Role = Role.objects.filter(users=user, name=4).exists()
             if Selected_Role is not None:
                 request.is_moderator = True
                 return None

@@ -8,49 +8,53 @@
     <link href="{% static 'css/blog.css' %}" rel="stylesheet">
     <link rel="shortcut icon" type="image/png" href="{% static 'favicon.ico' %}">
     <style>
-    body {
-    background: #100e19;
-    }
+        body {
+            background: #100e19;
+        }
 
 
     </style>
 </head>
 <body>
-<div id="sidebar">
-    <div id="first_sidebar">
-        <div class="inline_menu">
-            <a href="\"><img class="img_logo" src="{% static 'photos/standart_image.png' %}"></a>
-            {% if request.Auth_user != None %}
-            <a class="user_nick" href="\profile">{{ request.Auth_user }}</a>
-            {% else %}
-            <a class="menu_button" href="\login">> Login</a>
-            <a class="menu_button" href="\registration">> Registration</a>
-            {% endif %}
+<div class="scroll">
+    <div id="sidebar">
+        <div id="first_sidebar">
+            <div class="inline_menu">
+                <a href="\"><img class="img_logo" src="{% static 'photos/standart_image.png' %}"></a>
+                {% if request.Auth_user != None %}
+                    <a class="user_nick" href="\profile">{{ request.Auth_user }}</a>
+                {% else %}
+                    <a class="menu_button" href="\login">> Login</a>
+                    <a class="menu_button" href="\registration">> Registration</a>
+                {% endif %}
+            </div>
         </div>
-    </div>
-    <div id="second_sidebar">
-        {% if admin == True %}
-        <a class="menu_button" href="\add_film">> Add new film</a>
-        <a class="menu_button" href="\adminPanel">> AdminPanel</a>
+        <div id="second_sidebar">
+            <div class="n_req">
+                {% if admin == True %}
+                    <a class="menu_button" href="\add_film">> Add new film</a>
+                    <a class="menu_button" href="\adminPanel">> AdminPanel</a>
+                {% endif %}
+                <a class="menu_button" href="\">> Return to all films</a>
+            </div>
+            <a class="menu_button" href="\filters">> Find film</a>
+        </div>
+        {% if request.Auth_user != None %}
+            <div class="right_button">
+                <a class="menu_button" href="\logout">logout</a>
+            </div>
         {% endif %}
-        <a class="menu_button" href="\">> Return to all films</a>
-        <a class="menu_button" href="\filters">> Find film</a>
     </div>
-    {% if request.Auth_user != None %}
-    <div class="right_button">
-        <a class="menu_button" href="\logout">logout</a>
-    </div>
+    {% if error != True %}
+        <div id="content">
+            {% block content %}
+            {% endblock %}
+        </div>
+        <footer class="footer">Made by LorCO©</footer>
+    {% endif %}
+    {% if error == True %}
+        <a href="/login" class="center_error"><img class="center" src="{% static 'photos/404.png' %}"></a>
     {% endif %}
 </div>
-{% if error != True %}
-<div id="content">
-    {% block content %}
-    {% endblock %}
-</div>
-<footer class="footer">Made by LorCO©</footer>
-{% endif %}
-{% if error == True %}
-<a href="/login" class="center_error"><img class="center" src="{% static 'photos/404.png' %}"></a>
-{% endif %}
 </body>
 </html>

@@ -11,13 +11,17 @@
     <meta property="og:image" content="{% static best.url %}">
     <p class="center rgb_cee">Our top</p>
     {% for best in the_best %}
-        <div class="circle_top" style="background-image: url({{ best.img }});" onclick="location.href='/{{ best.slug }}'">
-            <a class="top_l">{{ best.name }}</a>
-            <p class="top_l">{{ best.star }}</p>
+        <div class="circle_top_all">
+            <!-- <a class='favorites'></a> -->
+            <div class="circle_top" style="background-image: url({% static 'photos/films/' %}{{ best.img }});"
+                 onclick="location.href='/{{ best.slug }}'">
+                <a class="top_l">{{ best.name }}</a>
+                <p class="top_l">{{ best.star }}</p>
+            </div>
         </div>
     {% endfor %}
     <script>
-        console.log('LorCO');
+        document.getElementsByClassName('circle_top')
     </script>
     <div class="all_posts">
         <h1 class="text_films">All films:</h1>
@@ -29,7 +33,7 @@
                     </a>
                     <p class="date">Style: {{ post.style }} </p>
                 </h2>
-                <img class="art" src="{% static 'photos/films/' %}{{post.slug}}.png">
+                <img class="art" src="{% static 'photos/films/' %}{{ post.slug }}.png">
                 <a class="description_left">{{ post.description|truncatewords:50|linebreaks }}</a>
                 <p class="date">Published: {{ post.publish }}</p>
             </div>

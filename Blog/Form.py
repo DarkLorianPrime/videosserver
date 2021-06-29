@@ -1,10 +1,17 @@
 from django import forms
-from .models import Actors, Prod, Styles
+from .models import Styles
+
+
+class RecentForm(forms.Form):
+    email = forms.EmailField()
+
+
+class ResetForm(forms.Form):
+    name = forms.CharField(widget=forms.PasswordInput)
+    new_name = forms.CharField(widget=forms.PasswordInput)
 
 
 class FiltersForm(forms.Form):
-    actor = forms.ModelChoiceField(required=False, queryset=Actors.objects.all())
-    producer = forms.ModelChoiceField(required=False, queryset=Prod.objects.all())
     names = forms.CharField(required=False)
 
 

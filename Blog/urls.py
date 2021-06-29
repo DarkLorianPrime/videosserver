@@ -12,4 +12,5 @@ urlpatterns = [
     path('add_style', views.New_Style.as_view(), name='new_style'),
     path('moderPanel', views.Moder_Panel.as_view(), name='moderPanel'),
     path('adminPanel', views.Admin_Panel.as_view(), name='adminPanel'),
+    path('resetPassword', views.Reset_Password.as_view(), name='resetPassword')
 ]

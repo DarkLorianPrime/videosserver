@@ -15,14 +15,14 @@ class Actors(models.Model):
     name = models.CharField(max_length=100)
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
 
 class Styles(models.Model):
     style = models.CharField(max_length=100)
 
     def __str__(self):
-        return self.style
+        return str(self.style)
 
 
 class Post(models.Model):

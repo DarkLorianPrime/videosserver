@@ -11,5 +11,5 @@ urlpatterns = [
     path('add_moderator/', views.Add_Moderator.as_view(), name='new_moderator'),
     path('delete_user/', views.Delete_User.as_view(), name='delete_user'),
     path('del_moderator/', views.Delete_Moderators.as_view(), name='delete_moderator'),
-    path('del_administrator/', views.Delete_Administrator.as_view(), name='delete_administrator')
+    path('del_administrator/', views.Delete_Administrator.as_view(), name='delete_administrator'),
 ]
