@@ -1,3 +1,6 @@
+import re
+
+
 def replacer(text):
-    text = text.replace(' ', '_').replace('(', '_').replace(')', '_').replace('`', '_').replace("'", '_').replace('"', '_')
+    text = re.sub(r"[$|@|&|`|'| |:|.|,|;|/|\|~|%|$|#|@|!|^|*|(|)|{|}]",  '_', text)
     return text

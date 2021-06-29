@@ -1,0 +1,53 @@
+{% extends "blog/base_to_login.html" %}
+{% load static %}
+{% block title %}Profile{% endblock %}
+{% block content %}
+    <body>
+    {% if request.Auth_user != None %}
+        <div class="center_reg">
+            <p>Hello, {{ request.Auth_user.username }}!</p>
+            <div class="center_prof">
+                <div>
+                    {% if ToFAdm == True %}
+                        <div class="block green">Administrator: {{ ToFAdm }}</div>
+                    {% else %}
+                        <div class="block red">Administrator: {{ ToFAdm }}</div>
+                    {% endif %}
+                    {% if ToFModer == True %}
+                        <div class="block green">Moderator: {{ ToFModer }}</div>
+                    {% else %}
+                        <div class="block red">Moderator: {{ ToFModer }}</div>
+                    {% endif %}
+                </div>
+                <div>
+                    {% if ToFModer == True %}
+                        <div class="block border-button" onclick="location.href='/moderPanel'"><a class="border-block-a"
+                                                                                                  href="/moderPanel">ModerPanel</a>
+                        </div>
+                    {% endif %}
+                    {% if ToFAdm == True %}
+                        <div class="block border-button" onclick="location.href='/adminPanel'"><a class="border-block-a"
+                                                                                                  href="/adminPanel">AdminPanel</a>
+                        </div>
+                    {% endif %}
+                </div>
+                <div>
+                    <div class="block"><p>Your email: {{ request.Auth_user.email }}</p><p>Change?</p></div>
+                    <a href="/Recent"><div class="block"><p>Change your password</p></div></a>
+                    <p class="block">Favorite Film: {{ fav_film }}</p>
+                </div>
+                <div>
+                    <div class="block">1321321</div>
+                    <div class="block">1321321</div>
+                </div>
+            </div>
+            <div class="ex">
+                <p><a href="/" class="menu_button">>Back</a></p>
+                <a href="/logout" class="menu_button">Logout</a>
+            </div>
+        </div>
+    {% else %}
+        <a href="/login" class="center_error"><img class="center" src="{% static 'photos/404.png' %}"></a>
+    {% endif %}
+    </body>
+{% endblock %}

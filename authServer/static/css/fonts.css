@@ -1,0 +1,14 @@
+@font-face {
+    font-family: 'Aqum';
+    src: local('Aqum'),
+        url('Aqum.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Weimar';
+    src: url('Weimar-Bold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+}

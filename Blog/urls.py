@@ -4,14 +4,13 @@ from . import views
 app_name = 'Blog_list'
 
 urlpatterns = [
-    path('filters/', views.filters, name='filters'),
-    path('', views.post_list, name='post_list'),
-    path('<slug:post>/', views.post_one, name='post_one'),
-    path('<slug:post>/delete', views.post_one_delete, name='post_one_delete'),
-    path('add_film', views.new_film, name='new_film'),
-    path('add_producer', views.new_producers, name='new_prod'),
-    path('add_actor', views.new_actor, name='new_actor'),
-    path('add_style', views.new_style, name='new_style'),
-    path('moderPanel', views.moderPanel, name='moderPanel'),
-    path('adminPanel', views.adminPanel, name='adminPanel'),
+    path('filters/', views.Filter.as_view(), name='filters'),
+    path('', views.Post_List.as_view(), name='post_list'),
+    path('<slug:post>/', views.One_Post.as_view(), name='post_one'),
+    path('<slug:post>/delete', views.Post_Delete.as_view(), name='post_one_delete'),
+    path('add_film', views.New_Film.as_view(), name='new_film'),
+    path('add_style', views.New_Style.as_view(), name='new_style'),
+    path('moderPanel', views.Moder_Panel.as_view(), name='moderPanel'),
+    path('adminPanel', views.Admin_Panel.as_view(), name='adminPanel'),
+    path('resetPassword', views.Reset_Password.as_view(), name='resetPassword')
 ]

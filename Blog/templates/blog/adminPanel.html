@@ -1,0 +1,15 @@
+{% extends "blog/base_to_blog.html" %}
+
+{% block title %}Admin Panel{% endblock %}
+
+{% block content %}
+<div class="all_posts center">
+    <h1>Admin Panel</h1>
+    <p><a class="menu_button" href="/add_admin">Add Administrators</a></p>
+    <p><a class="menu_button" href="/add_moderator">Add Moderators</a></p>
+    <p><a class="menu_button " href="/del_administrator">Del Administrators</a></p>
+    <p><a class="menu_button" href="/del_moderator">Del Moderators</a></p>
+    <p><a class="menu_button" href="/moderPanel">>Moder Panel</a></p>
+    <p><a class="menu_button" href="/">>Back</a></p>
+</div>
+{% endblock %}

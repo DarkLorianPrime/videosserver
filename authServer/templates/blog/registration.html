@@ -1,0 +1,33 @@
+{% extends "blog/base_to_login.html" %}
+{% load static %}
+{% block title %}Registration{% endblock %}
+
+{% block content %}
+    {% if request.Auth_user == None %}
+        <div class="center_reg">
+        <h2 class="Auth_class">Registration menu</h2>
+        {% if trouble == True %}
+            <p>WRONG LOGIN, E-MAIL OR PASSWORD!</p>
+        {% elif trouble == 'Login' %}
+            <p>THIS LOGIN ALREADY EXISTS!</p>
+        {% elif trouble == 'Email' %}
+            <p>THIS E-MAIL ALREADY EXISTS!</p>
+        {% endif %}
+        <form class="border_form" method="post">
+            <p>Login</p>
+            <p>{{ form.login }}</p>
+            <p>Password</p>
+            <p>{{ form.password }}</p>
+            <p>E-Mail</p>
+            <p>{{ form.email }}</p>
+            {% csrf_token %}
+            <p><a href="/Recent">Forgot password?</a></p>
+            <a href="/login">Login</a>
+            <a class="Back" href="/">>>Back</a>
+            <p><input class="input_button" type="submit" value="Register"></p>
+        </form>
+    {% else %}
+        <a href="/" class="center_error"><img class="center" src="{% static 'photos/404.png' %}"></a>
+    {% endif %}
+</div>
+{% endblock %}

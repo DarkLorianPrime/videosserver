@@ -1,0 +1,96 @@
+@font-face {
+    font-family: 'Weimar Extra';
+    src: url('Weimar-ExtraBold.eot');
+    src: local('Weimar Extra Bold'), local('Weimar-ExtraBold'),
+        url('Weimar-ExtraBold.eot?#iefix') format('embedded-opentype'),
+        url('Weimar-ExtraBold.woff2') format('woff2'),
+        url('Weimar-ExtraBold.woff') format('woff'),
+        url('Weimar-ExtraBold.ttf') format('truetype');
+    font-weight: 800;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Weimar';
+    src: url('Weimar-Bold.eot');
+    src: local('Weimar Bold'), local('Weimar-Bold'),
+        url('Weimar-Bold.eot?#iefix') format('embedded-opentype'),
+        url('Weimar-Bold.woff2') format('woff2'),
+        url('Weimar-Bold.woff') format('woff'),
+        url('Weimar-Bold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Weimar';
+    src: url('Weimar-Light.eot');
+    src: local('Weimar Light'), local('Weimar-Light'),
+        url('Weimar-Light.eot?#iefix') format('embedded-opentype'),
+        url('Weimar-Light.woff2') format('woff2'),
+        url('Weimar-Light.woff') format('woff'),
+        url('Weimar-Light.ttf') format('truetype');
+    font-weight: 300;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Weimar';
+    src: url('Weimar-Regular.eot');
+    src: local('Weimar'), local('Weimar-Regular'),
+        url('Weimar-Regular.eot?#iefix') format('embedded-opentype'),
+        url('Weimar-Regular.woff2') format('woff2'),
+        url('Weimar-Regular.woff') format('woff'),
+        url('Weimar-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Weimar';
+    src: url('Weimar-Thin.eot');
+    src: local('Weimar Thin'), local('Weimar-Thin'),
+        url('Weimar-Thin.eot?#iefix') format('embedded-opentype'),
+        url('Weimar-Thin.woff2') format('woff2'),
+        url('Weimar-Thin.woff') format('woff'),
+        url('Weimar-Thin.ttf') format('truetype');
+    font-weight: 100;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Weimar';
+    src: url('Weimar-Medium.eot');
+    src: local('Weimar Medium'), local('Weimar-Medium'),
+        url('Weimar-Medium.eot?#iefix') format('embedded-opentype'),
+        url('Weimar-Medium.woff2') format('woff2'),
+        url('Weimar-Medium.woff') format('woff'),
+        url('Weimar-Medium.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Weimar Extra';
+    src: url('Weimar-ExtraLight.eot');
+    src: local('Weimar Extra Light'), local('Weimar-ExtraLight'),
+        url('Weimar-ExtraLight.eot?#iefix') format('embedded-opentype'),
+        url('Weimar-ExtraLight.woff2') format('woff2'),
+        url('Weimar-ExtraLight.woff') format('woff'),
+        url('Weimar-ExtraLight.ttf') format('truetype');
+    font-weight: 200;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Weimar Semi';
+    src: url('Weimar-SemiBold.eot');
+    src: local('Weimar Semi Bold'), local('Weimar-SemiBold'),
+        url('Weimar-SemiBold.eot?#iefix') format('embedded-opentype'),
+        url('Weimar-SemiBold.woff2') format('woff2'),
+        url('Weimar-SemiBold.woff') format('woff'),
+        url('Weimar-SemiBold.ttf') format('truetype');
+    font-weight: 600;
+    font-style: normal;
+}
+

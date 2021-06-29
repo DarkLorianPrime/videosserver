@@ -1,0 +1,31 @@
+{% extends "blog/base_to_blog.html" %}
+{% load static %}
+
+{% block title %}Add film{% endblock %}
+{% block content %}
+    <div class="all_posts center">
+        <h1>Add new film</h1>
+        {% if loggined == True %}
+            <p class="text_prod">This slug already exists</p>
+        {% endif %}
+        <form id='form' method="post">
+            <p class="text_prod">Title</p>
+            <p class="border">{{ form.Title }}</p>
+            <p class="text_prod">Actors</p>
+            <input type="text" id="kinput_2" name="kinput_name_2">
+            <p class="text_prod">Producers</p>
+            <input type="text" id="kinput" name="kinput_name">
+            <p class="text_prod">Style</p>
+            <a class="border">{{ form.style }}</a>
+            <p class="text_prod">Description</p>
+            <a class="border text_sc">{{ form.description }}</a>
+            <div class="drop-area" id="drop-area" name="drop-area" ondragover="dragoverl(event)"
+                 ondragleave="dragleavel(event)" ondrop="drop(event)" onclick="open_files(event)">
+                <p class="replacer_as">Add to me your picture!</p>
+            </div>
+            {% csrf_token %}
+            <p><input class="input_button otstyp" type="submit" value="Add new film"></p>
+        </form>
+    </div>
+    <script src="{% static "/js/add_film.js"%}"></script>
+{% endblock %}

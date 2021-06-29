@@ -1,0 +1,65 @@
+{% extends "blog/base_to_blog.html" %}
+{% load static %}
+{% load joinner %}
+
+{% block title %}{{ post.title }}{% endblock %}
+{% block content %}
+    <div class="main_div_for_detail">
+        <div>
+            <br>
+            <br>
+            <br>
+            <h1>{{ post.title }}</h1>
+            <div class="ogr">
+                <img class="art_m" src="{% static 'photos/films/' %}{{ post.slug }}.png" alt="best rating">
+            </div>
+            <p class="text_desc">Actors:</p>
+            <a class="black">{{ actors|joiner:', ' }}</a>
+            <hr>
+            <p class="text_desc">Producer:</p>
+            <a class="black">{{ prods|joiner:', ' }}</a>
+            <hr>
+            <p class="text_desc">Description:</p>
+            <p class="text_desc">{{ post.description }}</p>
+            <video class="center" autoplay width="400" height="300" controls
+                   src="{% static 'videos/films/' %}{{ post.slug }}.mp4"></video>
+            <br>
+            <br>
+            <br>
+            <br>
+        </div>
+        {% if admin == True %}
+            <p><a class="menu_button button" href="delete">Delete this page</a></p>
+        {% endif %}
+        <img class="img_rate" src="{% static 'photos/star-fill.png' %}" alt="">All:{{ RatingAll.all }}
+        <img class="img_rate" src="{% static 'photos/star-fill.png' %}" alt="">1: {{ RatingAll.1 }}
+        <img class="img_rate" src="{% static 'photos/star-fill.png' %}" alt="">2: {{ RatingAll.2 }}
+        <img class="img_rate" src="{% static 'photos/star-fill.png' %}" alt="">3: {{ RatingAll.3 }}
+        <img class="img_rate" src="{% static 'photos/star-fill.png' %}" alt="">4: {{ RatingAll.4 }}
+        <img class="img_rate" src="{% static 'photos/star-fill.png' %}" alt="">5: {{ RatingAll.5 }}
+        {% if form != True %}
+            {% if request.Auth_user != None %}
+                <hr>
+                <form method="post">
+                    {{ form.like.0 }}
+                    <label aria-hidden="true" for="id_like_0"><img class="img_rate"
+                                                                   src="{% static 'photos/star-fill.png' %}" alt=""></label>
+                    {{ form.like.1 }}
+                    <label aria-hidden="true" for="id_like_1"><img class="img_rate"
+                                                                   src="{% static 'photos/star-fill.png' %}" alt=""></label>
+                    {{ form.like.2 }}
+                    <label aria-hidden="true" for="id_like_2"><img class="img_rate"
+                                                                   src="{% static 'photos/star-fill.png' %}" alt=""></label>
+                    {{ form.like.3 }}
+                    <label aria-hidden="true" for="id_like_3"><img class="img_rate"
+                                                                   src="{% static 'photos/star-fill.png' %}" alt=""></label>
+                    {{ form.like.4 }}
+                    <label aria-hidden="true" for="id_like_4"><img class="img_rate"
+                                                                   src="{% static 'photos/star-fill.png' %}" alt=""></label>
+                    <input class="input_button" type="submit" value="Rate!">
+                    {% csrf_token %}
+                </form>
+            {% endif %}
+        {% endif %}
+    </div>
+{% endblock %}

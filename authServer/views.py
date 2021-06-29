@@ -1,140 +1,172 @@
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
+from django.views import View
 
+from extras import logger_mini
 from extras.authentication import BackendAuth
 from .Form import RegistrationForm, LoginForm, new_moderForm, new_adminForm, AdminDeleteForm, ModerDeleteForm, \
     DelUserForm
 from .models import cookie_saves, Role
+from Blog.models import Rating
 
 
-def del_user(request):
-    form, text = DelUserForm()
-    if request.Is_Anypermissions:
-        return render(request, 'blog/post/deluser.html', {'error': True})
-    if request.method == 'POST':
-        form = DelUserForm(request.POST)
+class Delete_User(View):
+    form = DelUserForm
+
+    def get(self, request):
+        if not request.Is_Anypermissions:
+            return render(request, 'blog/deluser.html', {'error': True})
+        return render(request, 'blog/deluser.html', {'form': self.form(), 'who': 'user'})
+
+    def post(self, request):
+        form = self.form(request.POST)
         if form.is_valid():
             form_data = form.cleaned_data
             user = User.objects.filter(username=form_data['name']).first()
             if user is not None:
                 user.delete()
-    return render(request, 'blog/post/deluser.html', {'form': form, 'who': 'user'})
+        return render(request, 'blog/deluser.html', {'form': form, 'who': 'user'})
 
 
-def del_moderator(request):
-    form = ModerDeleteForm()
-    if not request.is_administrator:
-        return render(request, 'blog/post/deluser.html', {'error': True})
-    if request.method == 'POST':
-        form = ModerDeleteForm(request.POST)
+class Delete_Moderators(View):
+    form = ModerDeleteForm
+
+    def get(self, request):
+        if not request.is_administrator:
+            return render(request, 'blog/deluser.html', {'error': True})
+        return render(request, 'blog/deluser.html', {'form': self.form(), 'who': 'moderator'})
+
+    def post(self, request):
+        form = self.form(request.POST)
         if form.is_valid():
             form_data = form.cleaned_data
-            User_Model = User.objects.filter(username=form_data['name'])
-            Role_selected = Role.objects.filter(name='Administrator', Users=User_Model)
-            if Role_selected.is_Role:
-                Role_selected.is_Role = False
-                Role_selected.save()
-    return render(request, 'blog/post/deluser.html', {'form': form, 'who': 'moderator'})
+            User_Model = User.objects.filter(username=form_data['name']).first()
+            Role_selected = Role.objects.filter(name_id=4, users=User_Model).first()
+            if Role_selected is not None:
+                Role_selected.delete()
+                Role.objects.create(name_id=2, users=User_Model)
+                logger_mini.logger(request.Auth_user, 'Remove moderator', form_data['name'])
+            return render(request, 'blog/deluser.html', {'form': form, 'who': 'moderator'})
 
 
-def del_administrator(request):
-    form = AdminDeleteForm()  # Need fix!
-    if not request.is_administrator:
-        return render(request, 'blog/post/deluser.html', {'error': True})
-    if request.method == 'POST':
-        form = AdminDeleteForm(request.POST)
+class Delete_Administrator(View):
+    form = AdminDeleteForm
+
+    def get(self, request):
+        if not request.is_administrator:
+            return render(request, 'blog/deluser.html', {'error': True})
+        return render(request, 'blog/deluser.html', {'form': self.form(), 'who': 'administrator'})
+
+    def post(self, request):
+        form = self.form(request.POST)
         if form.is_valid():
             form_data = form.cleaned_data
-            user_account = User.objects.filter(username=form_data['name'])
-            find = Role.objects.filter(User=user_account, ).first()
-            if find is not None:
-                find.delete()
-    return render(request, 'blog/post/deluser.html', {'form': form, 'who': 'administrator'})
+            User_Model = User.objects.filter(username=form_data['name']).first()
+            Role_selected = Role.objects.filter(name_id=3, users=User_Model).first()
+            if Role_selected is not None:
+                Role_selected.delete()
+                Role.objects.create(name_id=4, users=User_Model)
+                logger_mini.logger(request.Auth_user, 'Remove administrator', form_data['name'])
+            return render(request, 'blog/deluser.html', {'form': form, 'who': 'administrator'})
 
 
-def auth(request):
-    if request.Auth_user is not None:
-        return redirect('/')
-    form, trouble = LoginForm(), False
-    if request.method == 'POST':
-        form = LoginForm(request.POST)
+class Auth(View):
+    trouble = False
+    form = LoginForm
+
+    def get(self, request):
+        return render(request, 'blog/share.html', {'form': self.form})
+
+    def post(self, request):
+        form = self.form(request.POST)
         if form.is_valid():
             form_data = form.cleaned_data
-            Login_return = BackendAuth().authenticate(request=request, username=form_data['login'], password=form_data['password'])
+            Login_return = BackendAuth().authenticate(request=request, username=form_data['login'],
+                                                      password=form_data['password'])
             if not Login_return.get('error'):
-                print(Login_return)
                 return Login_return
-        trouble = True
-    return render(request, 'blog/post/share.html', {'form': form, 'trouble': trouble})
+            return render(request, 'blog/share.html', {'form': self.form, 'trouble': Login_return['error']})
 
 
-def profile(request):
-    administrator = request.is_administrator
-    moderator = request.Is_Anypermissions
-    return render(request, 'blog/get/profile.html', {'ToFAdm': administrator, 'ToFModer': moderator, 'error': False})
+class Profile(View):
+    error = False
+
+    def get(self, request):
+        administrator = request.is_administrator
+        moderator = request.Is_Anypermissions
+        r = Rating.objects.filter(username=request.Auth_user).order_by('-stars').first()
+        return render(request, 'blog/profile.html',
+                      {'ToFAdm': administrator, 'ToFModer': moderator, 'error': self.error,
+                       'fav_film': r.name if r is not None else None})
 
 
-def registration(request):
-    form, trouble = RegistrationForm(), False
-    if request.Auth_user is not None:
-        return redirect('/')
-    if request.method == 'POST':
-        form = RegistrationForm(request.POST)
+class Registration(View):
+    form = RegistrationForm
+
+    def get(self, request):
+        return render(request, 'blog/registration.html', {'form': self.form()})
+
+    def post(self, request):
+        form = self.form(request.POST)
         if form.is_valid():
-            returned = form.cleaned_data
-            Registration_return = BackendAuth().authenticate(request=request, username=returned['login'],
-                                                             password=returned['password'],
-                                                             email=returned['email'], registration=True)
-            if Registration_return.get('error') == 'username':
-                trouble = 'Login'
-            elif Registration_return.get('error') == 'email':
-                trouble = 'Email'
+            form_data = form.cleaned_data
+            Registration_return = BackendAuth().authenticate(request=request, username=form_data['login'],
+                                                             password=form_data['password'],
+                                                             email=form_data['email'], registration=True)
+            if Registration_return.get('error'):
+                trouble = Registration_return.get('error')
             else:
                 return Registration_return
-    return render(request, 'blog/post/registration.html', {'form': form, 'trouble': trouble, 'error': False})
+            return render(request, 'blog/registration.html',
+                          {'form': self.form(), 'trouble': trouble, 'error': False})
 
 
-def add_moderator(request):
-    form = new_moderForm()
-    if request.method == 'POST':
-        form = new_moderForm(request.POST)
+class Add_Moderator(View):
+    form = new_moderForm
+
+    def get(self, request):
+        if not request.is_administrator:
+            return render(request, 'blog/new_admin.html', {'error': True})
+        return render(request, 'blog/new_admin.html', {'form': self.form(), 'loggined': True, 'new': 'moderator'})
+
+    def post(self, request):
+        form = self.form(request.POST)
         if form.is_valid():
-            returned = form.cleaned_data
-            User_Model = User.objects.filter(username=returned['nick'])
-            Role_selected = Role.objects.filter(name='Administrator', Users=User_Model)
-            if not Role_selected.is_Role:
-                Role_selected.is_Role = True
-                Role_selected.save()
-    if not request.is_administrator:
-        return render(request, 'blog/post/new_admin.html', {'error': True})
-    return render(request, 'blog/post/new_admin.html', {'form': form, 'loggined': True, 'new': 'moderator'})
+            form_data = form.cleaned_data
+            User_Model = User.objects.filter(username=form_data['nick']).first()
+            Role_selected = Role.objects.filter(name_id=4, users=User_Model).first()
+            if Role_selected is None:
+                Role.objects.filter(users=User_Model, name=2).delete()
+                Role.objects.create(name_id=4, users=User_Model)
+                logger_mini.logger(request.Auth_user, 'Add moderator', form_data['name'])
+        return render(request, 'blog/new_admin.html', {'form': form, 'loggined': True, 'new': 'moderator'})
 
 
-def add_admin(request):
-    if not request.is_administrator:
-        return render(request, 'blog/post/new_admin.html', {'error': True})
-    form = new_adminForm()
-    if request.method == 'POST':
-        form = new_adminForm(request.POST)
+class Add_Admin(View):
+    form = new_adminForm
+
+    def get(self, request):
+        if not request.is_administrator:
+            return render(request, 'blog/new_admin.html', {'error': True})
+        return render(request, 'blog/new_admin.html', {'form': self.form(), 'loggined': True, 'new': 'administrator'})
+
+    def post(self, request):
+        form = self.form(request.POST)
         if form.is_valid():
-            returned = form.cleaned_data
-            User_Model = User.objects.filter(username=returned['nick'])
-            Role_selected = Role.objects.filter(name='Administrator', Users=User_Model)
-            Role_selected_Mod = Role.objects.filter(name='Moderator', Users=User_Model)
-            if not Role_selected.is_Role:
-                Role_selected.is_Role = True
-                Role_selected.save()
-            if not Role_selected_Mod.is_Role:
-                Role_selected_Mod.is_Role = True
-                Role_selected_Mod.save()
-    return render(request, 'blog/post/new_admin.html', {'form': form, 'loggined': True, 'new': 'administrator'})
+            form_data = form.cleaned_data
+            User_Model = User.objects.filter(username=form_data['nick']).first()
+            Role_selected = Role.objects.filter(name_id=3, users=User_Model).first()
+            if Role_selected is None:
+                Role.objects.filter(users=User_Model, name=4).delete()
+                Role.objects.create(name_id=3, users=User_Model)
+                logger_mini.logger(request.Auth_user, 'Add administrator', form_data['name'])
+        return render(request, 'blog/new_admin.html', {'form': form, 'loggined': True, 'new': 'administrator'})
 
 
-def logout(request):
-    d = cookie_saves.objects.filter().first()
-    if d is not None:
-        d.delete()
-        req = redirect('/login/')
-        req.delete_cookie('loggined_token')
-        return req
-    return redirect('/')
+class Logout(View):
+    @staticmethod
+    def get(request):
+        form_data = redirect('/login/')
+        cookie_saves.objects.filter(cookie_user_data=request.Auth_user).delete()
+        form_data.delete_cookie('loggined_token')
+        return form_data
