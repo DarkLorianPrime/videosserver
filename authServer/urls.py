@@ -1,4 +1,6 @@
 from django.urls import path
+
+from Blog.views import Recent_Password, Recent_Password_local
 from . import views
 app_name = 'videosserver'
 
@@ -12,4 +14,6 @@ urlpatterns = [
     path('delete_user/', views.Delete_User.as_view(), name='delete_user'),
     path('del_moderator/', views.Delete_Moderators.as_view(), name='delete_moderator'),
     path('del_administrator/', views.Delete_Administrator.as_view(), name='delete_administrator'),
+    path('recent/', Recent_Password.as_view(), name='RecentPassword'),
+    path('recent/<str:request_token>/', Recent_Password_local.as_view(), name='RecentPasswordLocal')
 ]

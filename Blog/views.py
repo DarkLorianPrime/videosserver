@@ -2,18 +2,48 @@ import base64
 import os
 import shutil
 import smtplib
+import secrets
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 import dotenv
 import requests
 import transliterate
+from django.contrib.auth.models import User
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views import View
 
-from Blog.Form import FilmForm, NewStyleForm, RatingForm, FiltersForm, ResetForm, RecentForm
+from Blog.Form import FilmForm, NewStyleForm, RatingForm, FiltersForm, ResetForm, RecentForm, local_ResetForm
 from Blog.models import Post, Rating, Actors, Prod, Styles, Entire_rating
+from authServer.models import Recent_res
 from authServer.views import Logout
-from extras import logger_mini
+from extras import logger_mini, template_reader
 from extras.replacer import replacer
+
+
+class Recent_Password_local(View):
+    error = True
+    form = local_ResetForm
+
+    def get(self, request, request_token):
+        if request.Auth_user:
+            return render(request, 'blog/resetPassword.html', {'error': self.error})
+        user = Recent_res.objects.filter(request_token=request_token).first().user
+        return render(request, 'blog/resetPassword.html',
+                      {'form': self.form(), 'method_who': 'New_password', 'who': 'Reset password',
+                       'user': user.username})
+
+    def post(self, request, request_token):
+        form = self.form(request.POST)
+        if form.is_valid():
+            returned = form.cleaned_data
+            user = Recent_res.objects.filter(request_token=request_token).first()
+            if user is not None:
+                user.user.set_password(returned['name'])
+                user.save()
+                user.delete()
+                return redirect('/login')
+            return render(request, 'blog/resetPassword.html', {'error': self.error})
 
 
 class Reset_Password(View):
@@ -23,7 +53,8 @@ class Reset_Password(View):
     def get(self, request):
         if not request.Auth_user:
             return render(request, 'blog/resetPassword.html', {'error': self.error})
-        return render(request, 'blog/resetPassword.html', {'form': self.form()})
+        return render(request, 'blog/resetPassword.html',
+                      {'form': self.form(), 'method_who': 'Old_password', 'who': 'Reset password'})
 
     def post(self, request):
         form = self.form(request.POST)
@@ -35,8 +66,7 @@ class Reset_Password(View):
                 user.save()
                 Logout().get(request)
                 return redirect('/login')
-            else:
-                return render(request, 'blog/resetPassword.html', {'error': self.error})
+            return render(request, 'blog/resetPassword.html', {'error': self.error})
 
 
 class Recent_Password(View):
@@ -46,12 +76,34 @@ class Recent_Password(View):
     def get(self, request):
         if request.Auth_user:
             return render(request, 'blog/resetPassword.html', {'error': self.error})
-        return render(request, 'blog/resetPassword.html', {'form': self.form()})
+        return render(request, 'blog/resetPassword.html',
+                      {'form': self.form(), 'method_who': 'Email', 'who': 'Recent password'})
 
     def post(self, request):
         form = self.form(request.POST)
         if form.is_valid():
             returned = form.cleaned_data
+            if not User.objects.filter(email=returned['emails']).exists():
+                return render(request, 'blog/resetPassword.html', {'error': self.error})
+            message_template = template_reader.parse_template('ru')
+            obj = smtplib.SMTP('smtp.mail.ru', 587)
+            obj.starttls()
+            dotenv.load_dotenv()
+            obj.login(os.getenv('email_login'), os.getenv('email_password'))
+            multipart = MIMEMultipart()
+            user = User.objects.filter(email=returned['emails']).first()
+            code = secrets.token_urlsafe(8)
+            if Recent_res.objects.filter(user=user).exists():
+                code = Recent_res.objects.filter(user=user).first().request_token
+            else:
+                Recent_res.objects.create(user=user, request_token=code)
+            message = message_template.substitute(USER_NAME=user, code=code)
+            multipart['Subject'] = 'Recent Password'
+            multipart.attach(MIMEText(message, 'msg'))
+            obj.sendmail(to_addrs=returned['emails'], from_addr=os.getenv('email_login'),
+                         msg=multipart.as_string().encode('utf-8'))
+            del multipart
+            return redirect('/')
 
 
 class New_Style(View):
@@ -114,7 +166,8 @@ class Filter(View):
                     returned = Post.objects.filter(title__startswith=form_data['names'])
                     if returned.exists():
                         return redirect(f'/{returned.first().slug}')
-                    returned_actors = Post.objects.all().filter(producer=form_data['producer'], actors=form_data['actor'])
+                    returned_actors = Post.objects.all().filter(producer=form_data['producer'],
+                                                                actors=form_data['actor'])
                     self.error = True
                     return render(request, 'blog/filters.html',
                                   {'form': form, 'admin': request.Is_Anypermissions, 'error_local': self.error})
