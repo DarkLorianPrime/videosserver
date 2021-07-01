@@ -81,8 +81,15 @@ WSGI_APPLICATION = 'videosserver.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.getenv(key='db'),
+        'USER': os.getenv(key='user'),
+        'PASSWORD': os.getenv(key='password'),
+        'HOST': os.getenv(key='host'),
+        'PORT': os.getenv(key='PORT'),
+        'OPTIONS': {
+            "init_command": "SET foreign_key_checks = 0;",
+        }
     }
 }
 

@@ -15,7 +15,7 @@ from django.views import View
 
 from Blog.Form import FilmForm, NewStyleForm, RatingForm, FiltersForm, ResetForm, RecentForm, local_ResetForm
 from Blog.models import Post, Rating, Actors, Prod, Styles, Entire_rating
-from authServer.models import Recent_res
+from authServer.models import Recent_res, Role, Role_List
 from authServer.views import Logout
 from extras import logger_mini, template_reader
 from extras.replacer import replacer
@@ -121,7 +121,7 @@ class New_Style(View):
         form = self.form(request.POST)
         if form.is_valid():
             returned = form.cleaned_data
-            if not Styles.objects.filter(style=returned['Name']).exists():
+            if Styles.objects.filter(style=returned['Name']).exists():
                 return render(request, 'blog/new_prod.html',
                               {'form': form, 'loggined': True, 'admin': True, 'type': 'style'})
             Styles.objects.create(style=returned['Name'])
@@ -163,12 +163,16 @@ class Filter(View):
             if form_data['names'] != '':
                 information = form_data['names'].split(',')
                 for one_split in information:
+                    print(form_data['names'])
                     returned = Post.objects.filter(title__startswith=form_data['names'])
+                    print(returned.query)
                     if returned.exists():
-                        return redirect(f'/{returned.first().slug}')
+                        return render(request, 'blog/list.html',
+                                      {'posts': returned.all(), 'admin': request.Is_Anypermissions})
                     returned_actors = Post.objects.all().filter(producer=form_data['producer'],
                                                                 actors=form_data['actor'])
                     self.error = True
+                    print(type(returned))
                     return render(request, 'blog/filters.html',
                                   {'form': form, 'admin': request.Is_Anypermissions, 'error_local': self.error})
             list_find = Post.objects.all().filter(producer=form_data['producer'], actors=form_data['actor'])
