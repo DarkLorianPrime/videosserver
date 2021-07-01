@@ -18,7 +18,7 @@ class BackendAuth(BaseBackend):
             data_uuid, redirects, obj = uuid.uuid4().hex, redirect('/'), User.objects.filter(username=username).first()
             cookie_saves.objects.create(cookie_user_data_id=obj.id, cookie_user_token=data_uuid)
             redirects.set_cookie(key='loggined_token', value=data_uuid, max_age=1000000)
-            Role.objects.create(name=Role_List.objects.filter(name='User').first(), users=obj)
+            Role.objects.create(name_id=2, users=obj)
             return redirects
         obj = User.objects.filter(username=username).first()
         if obj is None:

@@ -3,7 +3,11 @@ from .models import Styles
 
 
 class RecentForm(forms.Form):
-    email = forms.EmailField()
+    emails = forms.EmailField()
+
+
+class local_ResetForm(forms.Form):
+    name = forms.CharField(widget=forms.PasswordInput)
 
 
 class ResetForm(forms.Form):

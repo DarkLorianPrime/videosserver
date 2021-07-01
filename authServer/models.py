@@ -20,4 +20,12 @@ class Role(models.Model):
 
     def __str__(self):
         return str(self.users)
+
+
+class Recent_res(models.Model):
+    request_token = models.CharField(max_length=255)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="User_token_recent")
+
+    def __str__(self):
+        return str(self.request_token)
 # Create your models here.

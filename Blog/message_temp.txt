@@ -1,0 +1,6 @@
+Dear ${USER_NAME}, 
+You are seeing this email because you have sent a request for password recovery.
+If you didn't do it, just ignore this message.
+If you are, then your recovery code is: video.darklorian.space/recent/${code}
+Have a nice day,
+video.darklorian.space.
