@@ -4,7 +4,7 @@ from django.contrib.auth.backends import BaseBackend
 from django.contrib.auth.models import User
 from django.shortcuts import redirect
 
-from authServer.models import cookie_saves, Role, Role_List
+from authServer.models import cookie_saves, Role
 
 
 class BackendAuth(BaseBackend):
@@ -18,7 +18,7 @@ class BackendAuth(BaseBackend):
             data_uuid, redirects, obj = uuid.uuid4().hex, redirect('/'), User.objects.filter(username=username).first()
             cookie_saves.objects.create(cookie_user_data_id=obj.id, cookie_user_token=data_uuid)
             redirects.set_cookie(key='loggined_token', value=data_uuid, max_age=1000000)
-            Role.objects.create(name=Role_List.objects.filter(name='User').first(), users=obj)
+            Role.objects.create(name_id=2, users=obj)
             return redirects
         obj = User.objects.filter(username=username).first()
         if obj is None:

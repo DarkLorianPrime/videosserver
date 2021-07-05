@@ -32,8 +32,8 @@
                     {% endif %}
                 </div>
                 <div>
-                    <div class="block"><p>Your email: {{ request.Auth_user.email }}</p><p>Change?</p></div>
-                    <a href="/Recent"><div class="block"><p>Change your password</p></div></a>
+                    <div class="block"><p>Your email: {{ request.Auth_user.email }}</p></div>
+                    <a href="/resetPassword"><div class="block"><p>Change your password</p></div></a>
                     <p class="block">Favorite Film: {{ fav_film }}</p>
                 </div>
                 <div>

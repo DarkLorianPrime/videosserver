@@ -92,11 +92,9 @@ class Profile(View):
     error = False
 
     def get(self, request):
-        administrator = request.is_administrator
-        moderator = request.Is_Anypermissions
         r = Rating.objects.filter(username=request.Auth_user).order_by('-stars').first()
         return render(request, 'blog/profile.html',
-                      {'ToFAdm': administrator, 'ToFModer': moderator, 'error': self.error,
+                      {'ToFAdm': request.is_administrator, 'ToFModer': request.Is_Anypermissions, 'error': self.error,
                        'fav_film': r.name if r is not None else None})
 
 
@@ -138,7 +136,7 @@ class Add_Moderator(View):
             if Role_selected is None:
                 Role.objects.filter(users=User_Model, name=2).delete()
                 Role.objects.create(name_id=4, users=User_Model)
-                logger_mini.logger(request.Auth_user, 'Add moderator', form_data['name'])
+                logger_mini.logger(request.Auth_user, 'Add moderator', form_data['nick'])
         return render(request, 'blog/new_admin.html', {'form': form, 'loggined': True, 'new': 'moderator'})
 
 
@@ -159,7 +157,7 @@ class Add_Admin(View):
             if Role_selected is None:
                 Role.objects.filter(users=User_Model, name=4).delete()
                 Role.objects.create(name_id=3, users=User_Model)
-                logger_mini.logger(request.Auth_user, 'Add administrator', form_data['name'])
+                logger_mini.logger(request.Auth_user, 'Add administrator', form_data['nick'])
         return render(request, 'blog/new_admin.html', {'form': form, 'loggined': True, 'new': 'administrator'})
 
 

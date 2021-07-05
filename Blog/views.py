@@ -1,19 +1,44 @@
 import base64
 import os
 import shutil
-import smtplib
 
-import dotenv
 import requests
 import transliterate
+from django.contrib.auth.models import User
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views import View
 
-from Blog.Form import FilmForm, NewStyleForm, RatingForm, FiltersForm, ResetForm, RecentForm
+from Blog.Form import FilmForm, NewStyleForm, RatingForm, FiltersForm, ResetForm, RecentForm, local_ResetForm
 from Blog.models import Post, Rating, Actors, Prod, Styles, Entire_rating
+from authServer.models import Recent_res
 from authServer.views import Logout
 from extras import logger_mini
 from extras.replacer import replacer
+from extras.smpt_mail import send_mail
+
+
+class Recent_Password_local(View):
+    error = True
+    form = local_ResetForm
+
+    def get(self, request, request_token):
+        if request.Auth_user:
+            return render(request, 'blog/resetPassword.html', {'error': self.error})
+        user = Recent_res.objects.filter(request_token=request_token).first().user
+        return render(request, 'blog/resetPassword.html',
+                      {'form': self.form(), 'method_who': 'New_password', 'who': 'Reset password',
+                       'user': user.username})
+
+    def post(self, request, request_token):
+        form = self.form(request.POST)
+        if form.is_valid():
+            returned = form.cleaned_data
+            user = Recent_res.objects.filter(request_token=request_token).first()
+            if user is not None:
+                user.user.set_password(returned['name'])
+                user.delete()
+                return redirect('/login')
+            return render(request, 'blog/resetPassword.html', {'error': self.error})
 
 
 class Reset_Password(View):
@@ -23,7 +48,8 @@ class Reset_Password(View):
     def get(self, request):
         if not request.Auth_user:
             return render(request, 'blog/resetPassword.html', {'error': self.error})
-        return render(request, 'blog/resetPassword.html', {'form': self.form()})
+        return render(request, 'blog/resetPassword.html',
+                      {'form': self.form(), 'method_who': 'Old_password', 'who': 'Reset password'})
 
     def post(self, request):
         form = self.form(request.POST)
@@ -31,12 +57,10 @@ class Reset_Password(View):
             returned = form.cleaned_data
             user = request.Auth_user
             if user.check_password(returned['name']):
-                user.set_password(returned['new_name'])
-                user.save()
+                user.set_password(returned['new_name']).save()
                 Logout().get(request)
                 return redirect('/login')
-            else:
-                return render(request, 'blog/resetPassword.html', {'error': self.error})
+            return render(request, 'blog/resetPassword.html', {'error': self.error})
 
 
 class Recent_Password(View):
@@ -46,12 +70,17 @@ class Recent_Password(View):
     def get(self, request):
         if request.Auth_user:
             return render(request, 'blog/resetPassword.html', {'error': self.error})
-        return render(request, 'blog/resetPassword.html', {'form': self.form()})
+        return render(request, 'blog/resetPassword.html',
+                      {'form': self.form(), 'method_who': 'Email', 'who': 'Recent password'})
 
     def post(self, request):
         form = self.form(request.POST)
         if form.is_valid():
             returned = form.cleaned_data
+            if not User.objects.filter(email=returned['emails']).exists():
+                return render(request, 'blog/resetPassword.html', {'error': self.error})
+            send_mail(os.getenv('email_login'), os.getenv('email_password'), returned['emails'])
+            return redirect('/')
 
 
 class New_Style(View):
@@ -69,7 +98,7 @@ class New_Style(View):
         form = self.form(request.POST)
         if form.is_valid():
             returned = form.cleaned_data
-            if not Styles.objects.filter(style=returned['Name']).exists():
+            if Styles.objects.filter(style=returned['Name']).exists():
                 return render(request, 'blog/new_prod.html',
                               {'form': form, 'loggined': True, 'admin': True, 'type': 'style'})
             Styles.objects.create(style=returned['Name'])
@@ -105,21 +134,25 @@ class Filter(View):
                       {'form': FiltersForm(), 'admin': request.Is_Anypermissions, 'error_local': self.error})
 
     def post(self, request):
+        data_can = []
         form = FiltersForm(request.POST)
         if form.is_valid():
             form_data = form.cleaned_data
             if form_data['names'] != '':
-                information = form_data['names'].split(',')
+                information = form_data['names'].split(', ')
                 for one_split in information:
-                    returned = Post.objects.filter(title__startswith=form_data['names'])
+                    returned = Post.objects.filter(title__istartswith=one_split)
                     if returned.exists():
-                        return redirect(f'/{returned.first().slug}')
-                    returned_actors = Post.objects.all().filter(producer=form_data['producer'], actors=form_data['actor'])
-                    self.error = True
-                    return render(request, 'blog/filters.html',
-                                  {'form': form, 'admin': request.Is_Anypermissions, 'error_local': self.error})
-            list_find = Post.objects.all().filter(producer=form_data['producer'], actors=form_data['actor'])
-            return render(request, 'blog/list.html', {'posts': list_find, 'admin': request.Is_Anypermissions})
+                        data_can.append(returned.all())
+                    returned = Post.objects.filter(actors=Actors.objects.filter(name__istartswith=one_split).first())
+                    if returned.exists():
+                        data_can.append(returned.all())
+                    returned = Post.objects.filter(
+                            producer=Prod.objects.filter(name__istartswith=one_split).first())
+                    if returned.exists():
+                        data_can.append(returned.all())
+            return render(request, 'blog/filters_list.html',
+                          {'posts': data_can, 'admin': request.Is_Anypermissions})
 
 
 class New_Film(View):
