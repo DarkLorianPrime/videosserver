@@ -1,6 +1,5 @@
 {% extends "blog/base_to_blog.html" %}
 {% load static %}
-{% load joinner %}
 
 {% block title %}{{ post.title }}{% endblock %}
 {% block content %}
@@ -14,10 +13,20 @@
                 <img class="art_m" src="{% static 'photos/films/' %}{{ post.slug }}.png" alt="best rating">
             </div>
             <p class="text_desc">Actors:</p>
-            <a class="black">{{ actors|joiner:', ' }}</a>
+            {% for actor in actors  %}
+                {{ actor.name }}
+                {% if not forloop.last %}
+                ,
+                {% endif %}
+            {% endfor %}
             <hr>
             <p class="text_desc">Producer:</p>
-            <a class="black">{{ prods|joiner:', ' }}</a>
+            {% for producer in producers  %}
+                {{ producer.name }}
+                {% if not forloop.last %}
+                ,
+                {% endif %}
+            {% endfor %}
             <hr>
             <p class="text_desc">Description:</p>
             <p class="text_desc">{{ post.description }}</p>
@@ -32,11 +41,11 @@
             <p><a class="menu_button button" href="delete">Delete this page</a></p>
         {% endif %}
         <img class="img_rate" src="{% static 'photos/star-fill.png' %}" alt="">All:{{ RatingAll.all }}
-        <img class="img_rate" src="{% static 'photos/star-fill.png' %}" alt="">1: {{ RatingAll.1 }}
-        <img class="img_rate" src="{% static 'photos/star-fill.png' %}" alt="">2: {{ RatingAll.2 }}
-        <img class="img_rate" src="{% static 'photos/star-fill.png' %}" alt="">3: {{ RatingAll.3 }}
-        <img class="img_rate" src="{% static 'photos/star-fill.png' %}" alt="">4: {{ RatingAll.4 }}
-        <img class="img_rate" src="{% static 'photos/star-fill.png' %}" alt="">5: {{ RatingAll.5 }}
+        <img class="img_rate" src="{% static 'photos/star-fill.png' %}" alt="">1: {{ RatingAll.one }}
+        <img class="img_rate" src="{% static 'photos/star-fill.png' %}" alt="">2: {{ RatingAll.two }}
+        <img class="img_rate" src="{% static 'photos/star-fill.png' %}" alt="">3: {{ RatingAll.three }}
+        <img class="img_rate" src="{% static 'photos/star-fill.png' %}" alt="">4: {{ RatingAll.four }}
+        <img class="img_rate" src="{% static 'photos/star-fill.png' %}" alt="">5: {{ RatingAll.five }}
         {% if form != True %}
             {% if request.Auth_user != None %}
                 <hr>

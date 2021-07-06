@@ -69,7 +69,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
-            'builtins': ['Blog.templatetags.joinner'],
+            'builtins': [],
         },
     },
 ]
@@ -85,7 +85,7 @@ DATABASES = {
         'NAME': os.getenv(key='db'),
         'USER': os.getenv(key='user'),
         'PASSWORD': os.getenv(key='password'),
-        'HOST': os.getenv(key='host'),
+        'HOST': os.getenv(key='host_1'),
         'PORT': os.getenv(key='PORT'),
         'OPTIONS': {
             "init_command": "SET foreign_key_checks = 0;",

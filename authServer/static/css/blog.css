@@ -210,7 +210,9 @@ a {
     border-radius: 45%;
     border: 2px solid red;
 }
-
+input {
+    color: black;
+}
 #id_actors, #id_prod, #id_actors:focus, #id_prod:focus {
     width: 400px;
     height: 75px;
@@ -229,7 +231,7 @@ option, option:focus {
 }
 
 #id_password, #id_login, #id_email, #id_Title{
-    color: white;
+    color: black;
     border: none;
     background-color: white;
     border-bottom: 5px solid black;
