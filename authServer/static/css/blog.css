@@ -161,7 +161,7 @@ a {
     cursor: pointer;
     font-size: 24px;
     margin-bottom: 10px;
-    width: 60%;
+    width: 100%;
     background-color: rgba(255, 255, 255, 0.5);
     transition: all 100ms;
     letter-spacing: 0;
@@ -228,8 +228,8 @@ option, option:focus {
     background-color: rgba(255, 255, 255, 0.1);
 }
 
-#id_password, #id_login, #id_email, #id_Title{
-    color: white;
+#id_password, #id_login, #id_email, #id_Title {
+    color: black;
     border: none;
     background-color: white;
     border-bottom: 5px solid black;
@@ -273,7 +273,7 @@ option, option:focus {
     background-color: rgba(255, 255, 255, 0.1);
 }
 
-#id_Title, #id_style, #id_art_link, #id_Name, #id_slug, #id_nick, #id_name, #id_emails, #id_new_name, input[name=kinput_name_2], input[name=kinput_name] {
+#id_Title, #id_style, #id_art_link, #id_Name, #id_slug, #id_nick, #id_name, #id_new_name, input[name=kinput_name_2], input[name=kinput_name] {
     background-color: rgba(255, 255, 255, 0.1);
     border: 0;
     border-left: 1px solid red;

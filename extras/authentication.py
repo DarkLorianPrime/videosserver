@@ -4,7 +4,7 @@ from django.contrib.auth.backends import BaseBackend
 from django.contrib.auth.models import User
 from django.shortcuts import redirect
 
-from authServer.models import cookie_saves, Role, Role_List
+from authServer.models import cookie_saves, Role
 
 
 class BackendAuth(BaseBackend):

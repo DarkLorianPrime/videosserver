@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect
 from django.views import View
 
 from extras import logger_mini
+from extras.Delete_users_role import deleter
 from extras.authentication import BackendAuth
 from .Form import RegistrationForm, LoginForm, new_moderForm, new_adminForm, AdminDeleteForm, ModerDeleteForm, \
     DelUserForm
@@ -20,11 +21,12 @@ class Delete_User(View):
 
     def post(self, request):
         form = self.form(request.POST)
-        if form.is_valid():
-            form_data = form.cleaned_data
-            user = User.objects.filter(username=form_data['name']).first()
-            if user is not None:
-                user.delete()
+        if not form.is_valid():
+            return render(request, 'blog/deluser.html', {'error': True})
+        form_data = form.cleaned_data
+        user = User.objects.filter(username=form_data['name']).first()
+        if user is not None:
+            user.delete()
         return render(request, 'blog/deluser.html', {'form': form, 'who': 'user'})
 
 
@@ -38,15 +40,11 @@ class Delete_Moderators(View):
 
     def post(self, request):
         form = self.form(request.POST)
-        if form.is_valid():
-            form_data = form.cleaned_data
-            User_Model = User.objects.filter(username=form_data['name']).first()
-            Role_selected = Role.objects.filter(name_id=4, users=User_Model).first()
-            if Role_selected is not None:
-                Role_selected.delete()
-                Role.objects.create(name_id=2, users=User_Model)
-                logger_mini.logger(request.Auth_user, 'Remove moderator', form_data['name'])
-            return render(request, 'blog/deluser.html', {'form': form, 'who': 'moderator'})
+        if not form.is_valid():
+            return render(request, 'blog/deluser.html', {'error': True})
+        form_data = form.cleaned_data
+        deleter(form_data, request, 4, 2)
+        return render(request, 'blog/deluser.html', {'form': form, 'who': 'moderator'})
 
 
 class Delete_Administrator(View):
@@ -59,15 +57,11 @@ class Delete_Administrator(View):
 
     def post(self, request):
         form = self.form(request.POST)
-        if form.is_valid():
-            form_data = form.cleaned_data
-            User_Model = User.objects.filter(username=form_data['name']).first()
-            Role_selected = Role.objects.filter(name_id=3, users=User_Model).first()
-            if Role_selected is not None:
-                Role_selected.delete()
-                Role.objects.create(name_id=4, users=User_Model)
-                logger_mini.logger(request.Auth_user, 'Remove administrator', form_data['name'])
-            return render(request, 'blog/deluser.html', {'form': form, 'who': 'administrator'})
+        if not form.is_valid():
+            return render(request, 'blog/deluser.html', {'error': True})
+        form_data = form.cleaned_data
+        deleter(form_data, request, 3, 4)
+        return render(request, 'blog/deluser.html', {'form': form, 'who': 'administrator'})
 
 
 class Auth(View):
@@ -79,13 +73,14 @@ class Auth(View):
 
     def post(self, request):
         form = self.form(request.POST)
-        if form.is_valid():
-            form_data = form.cleaned_data
-            Login_return = BackendAuth().authenticate(request=request, username=form_data['login'],
-                                                      password=form_data['password'])
-            if not Login_return.get('error'):
-                return Login_return
-            return render(request, 'blog/share.html', {'form': self.form, 'trouble': Login_return['error']})
+        if not form.is_valid():
+            return render(request, 'blog/share.html', {'error': True})
+        form_data = form.cleaned_data
+        Login_return = BackendAuth().authenticate(request=request, username=form_data['login'],
+                                                  password=form_data['password'])
+        if not Login_return.get('error'):
+            return Login_return
+        return render(request, 'blog/share.html', {'form': self.form, 'trouble': Login_return['error']})
 
 
 class Profile(View):
@@ -106,17 +101,18 @@ class Registration(View):
 
     def post(self, request):
         form = self.form(request.POST)
-        if form.is_valid():
-            form_data = form.cleaned_data
-            Registration_return = BackendAuth().authenticate(request=request, username=form_data['login'],
-                                                             password=form_data['password'],
-                                                             email=form_data['email'], registration=True)
-            if Registration_return.get('error'):
-                trouble = Registration_return.get('error')
-            else:
-                return Registration_return
-            return render(request, 'blog/registration.html',
-                          {'form': self.form(), 'trouble': trouble, 'error': False})
+        if not form.is_valid():
+            return render(request, 'blog/registration.html', {'error': True})
+        form_data = form.cleaned_data
+        Registration_return = BackendAuth().authenticate(request=request, username=form_data['login'],
+                                                         password=form_data['password'],
+                                                         email=form_data['email'], registration=True)
+        if Registration_return.get('error'):
+            trouble = Registration_return.get('error')
+        else:
+            return Registration_return
+        return render(request, 'blog/registration.html',
+                      {'form': self.form(), 'trouble': trouble, 'error': False})
 
 
 class Add_Moderator(View):
@@ -129,14 +125,10 @@ class Add_Moderator(View):
 
     def post(self, request):
         form = self.form(request.POST)
-        if form.is_valid():
-            form_data = form.cleaned_data
-            User_Model = User.objects.filter(username=form_data['nick']).first()
-            Role_selected = Role.objects.filter(name_id=4, users=User_Model).first()
-            if Role_selected is None:
-                Role.objects.filter(users=User_Model, name=2).delete()
-                Role.objects.create(name_id=4, users=User_Model)
-                logger_mini.logger(request.Auth_user, 'Add moderator', form_data['nick'])
+        if not form.is_valid():
+            return render(request, 'blog/new_admin.html', {'error': True})
+        form_data = form.cleaned_data
+        deleter(form_data, request, 2, 4)
         return render(request, 'blog/new_admin.html', {'form': form, 'loggined': True, 'new': 'moderator'})
 
 
@@ -150,20 +142,16 @@ class Add_Admin(View):
 
     def post(self, request):
         form = self.form(request.POST)
-        if form.is_valid():
-            form_data = form.cleaned_data
-            User_Model = User.objects.filter(username=form_data['nick']).first()
-            Role_selected = Role.objects.filter(name_id=3, users=User_Model).first()
-            if Role_selected is None:
-                Role.objects.filter(users=User_Model, name=4).delete()
-                Role.objects.create(name_id=3, users=User_Model)
-                logger_mini.logger(request.Auth_user, 'Add administrator', form_data['nick'])
+        if not form.is_valid():
+            return render(request, 'blog/new_admin.html', {'error': True})
+        form_data = form.cleaned_data
+        deleter(form_data, request, 4, 3)
         return render(request, 'blog/new_admin.html', {'form': form, 'loggined': True, 'new': 'administrator'})
 
 
 class Logout(View):
-    @staticmethod
-    def get(request):
+
+    def get(self, request):
         form_data = redirect('/login/')
         cookie_saves.objects.filter(cookie_user_data=request.Auth_user).delete()
         form_data.delete_cookie('loggined_token')

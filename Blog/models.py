@@ -42,14 +42,6 @@ class Post(models.Model):
         return self.title
 
 
-class Entire_rating(models.Model):
-    name = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='entire_post_name')
-    entire_stars = models.FloatField()
-
-    def __str__(self):
-        return self.name
-
-
 class Rating(models.Model):
     name = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='all_rating_post')
     stars = models.IntegerField()
